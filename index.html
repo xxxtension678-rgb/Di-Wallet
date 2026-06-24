@@ -534,7 +534,7 @@
             document.getElementById('sync-info').innerText = msg;
         }
 
-        /* --- ☁️ Fix Google Drive Direct API Logic --- */
+        /* --- ☁️ Google Drive Direct API Logic --- */
         function initTokenClient() {
             try {
                 tokenClient = google.accounts.oauth2.initTokenClient({
@@ -564,7 +564,6 @@
         async function syncWithCloud() {
             updateSyncStatus("searching app storage...");
             try {
-                // 1. App Data Folder ထဲမှာ ဖိုင်ရှိမရှိ အရင်ရှာမယ်
                 let searchUrl = `https://www.googleapis.com/drive/v3/files?q=name='di_wallet_backup.json'+and+spaces='appDataFolder'&key=${API_KEY}`;
                 let res = await fetch(searchUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
                 let data = await res.json();
@@ -573,7 +572,6 @@
                     backupFileId = data.files[0].id;
                     updateSyncStatus("downloading cloud backup...");
                     
-                    // 2. ဖိုင်ရှိရင် ဒေါင်းလုဒ်ဆွဲပြီး လက်ရှိ data နဲ့ ပေါင်းမယ်
                     let downloadUrl = `https://www.googleapis.com/drive/v3/files/${backupFileId}?alt=media&key=${API_KEY}`;
                     let fileRes = await fetch(downloadUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
                     let cloudData = await fileRes.json();
@@ -594,7 +592,6 @@
             updateSyncStatus("uploading backup...");
             try {
                 if (backupFileId) {
-                    // Update existing file
                     let url = `https://www.googleapis.com/upload/drive/v3/files/${backupFileId}?uploadType=media&key=${API_KEY}`;
                     await fetch(url, {
                         method: 'PATCH',
@@ -602,7 +599,6 @@
                         body: JSON.stringify(expenseData)
                     });
                 } else {
-                    // Create new file inside appDataFolder
                     let metadata = { name: 'di_wallet_backup.json', parents: ['appDataFolder'] };
                     let form = new FormData();
                     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
