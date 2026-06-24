@@ -3,239 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Di-Wallet - Daily Expense Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>di-wallet</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg: #090d16;
+            --card: #111827;
+            --border: #1f2937;
+            --text: #f3f4f6;
+            --muted: #9ca3af;
             --primary: #38bdf8;
-            --primary-hover: #0ea5e9;
-            --border-color: #334155;
-            --accent-breakfast: #fbbf24;
-            --accent-lunch: #34d399;
-            --accent-dinner: #f43f5e;
-            --accent-other: #a78bfa;
+            --accent-bf: #f59e0b;
+            --accent-lh: #10b981;
+            --accent-dn: #ef4444;
+            --accent-ot: #8b5cf6;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: monospace;
+            font-size: 11px;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 20px;
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 10px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            justify-content: center;
         }
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 480px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 10px;
         }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: bold;
             color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            text-transform: lowercase;
         }
 
-        .auth-btn {
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
+        .header-actions {
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s;
         }
 
-        .auth-btn:hover {
-            opacity: 0.9;
+        .auth-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
         }
 
-        .user-profile {
+        .user-info {
             display: flex;
             align-items: center;
+            gap: 4px;
+            color: var(--accent-lh);
+        }
+
+        .settings-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 4px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* tab navigation */
+        .tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 4px;
+            text-transform: lowercase;
+        }
+
+        .tab-btn.active {
+            background: var(--border);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .view-panel {
+            display: none;
+        }
+
+        .view-panel.active {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
         }
 
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-        }
-
-        .main-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid var(--border-color);
-        }
-
-        h2 {
-            font-size: 18px;
-            margin-bottom: 16px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .filters {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
+            margin-bottom: 8px;
         }
 
         label {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--muted);
+            text-transform: lowercase;
         }
 
         select, input {
-            background: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 14px;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 6px;
+            border-radius: 4px;
             outline: none;
             width: 100%;
-        }
-
-        select:focus, input:focus {
-            border-color: var(--primary);
         }
 
         .grid-inputs {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 8px;
         }
 
-        .category-input {
-            border-left: 4px solid var(--primary);
-        }
-        .cat-breakfast { border-left-color: var(--accent-breakfast); }
-        .cat-lunch { border-left-color: var(--accent-lunch); }
-        .cat-dinner { border-left-color: var(--accent-dinner); }
-        .cat-other { border-left-color: var(--accent-other); }
+        .input-bf { border-left: 3px solid var(--accent-bf); }
+        .input-lh { border-left: 3px solid var(--accent-lh); }
+        .input-dn { border-left: 3px solid var(--accent-dn); }
+        .input-ot { border-left: 3px solid var(--accent-ot); }
 
-        .btn-save {
+        .btn-main {
             background: var(--primary);
-            color: var(--bg-color);
-            font-weight: 700;
+            color: var(--bg);
             border: none;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: 4px;
             width: 100%;
             cursor: pointer;
-            font-size: 15px;
-            transition: background 0.2s;
+            font-weight: bold;
+            text-transform: lowercase;
+            margin-top: 4px;
         }
 
-        .btn-save:hover {
-            background: var(--primary-hover);
-        }
-
-        .history-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid var(--border-color);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin-top: 15px;
+        /* table view styles (compact & no horizontal scroll) */
+        .table-wrapper {
+            overflow-x: hidden;
+            margin-top: 4px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 14px;
+        }
+
+        th, td {
+            padding: 4px 2px;
+            border-bottom: 1px solid var(--border);
         }
 
         th {
-            color: var(--text-muted);
-            font-weight: 500;
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
+            color: var(--muted);
+            font-weight: normal;
         }
 
-        td {
-            padding: 12px 10px;
-            border-bottom: 1px solid var(--border-color);
-        }
+        .col-date { width: 14%; }
+        .col-amt { width: 16%; text-align: right; }
+        .col-tot { width: 20%; text-align: right; font-weight: bold; }
 
-        .badge {
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .bg-breakfast { background: rgba(251, 191, 36, 0.15); color: var(--accent-breakfast); }
-        .bg-lunch { background: rgba(52, 211, 153, 0.15); color: var(--accent-lunch); }
-        .bg-dinner { background: rgba(244, 63, 94, 0.15); color: var(--accent-dinner); }
-        .bg-other { background: rgba(167, 139, 250, 0.15); color: var(--accent-other); }
+        .txt-bf { color: var(--accent-bf); }
+        .txt-lh { color: var(--accent-lh); }
+        .txt-dn { color: var(--accent-dn); }
+        .txt-ot { color: var(--accent-ot); }
 
         .total-box {
             display: flex;
             justify-content: space-between;
-            background: var(--bg-color);
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-weight: 600;
-            border: 1px solid var(--border-color);
+            background: var(--bg);
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            margin-top: 6px;
+            font-weight: bold;
         }
 
-        .sync-status {
-            font-size: 12px;
-            color: var(--text-muted);
+        .status-bar {
+            font-size: 10px;
+            color: var(--muted);
             text-align: center;
-            margin-top: 8px;
+            text-transform: lowercase;
+        }
+
+        /* modal settings view */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            z-index: 100;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 440px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--accent-dn);
+            cursor: pointer;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -243,95 +281,113 @@
 
     <div class="container">
         <header>
-            <div class="logo">
-                <span>📊</span> Di-Wallet
-            </div>
-            <div id="auth-area">
-                <button class="auth-btn" onclick="handleAuthClick()">
-                    <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.9c1.69-1.55 2.69-3.83 2.69-6.58z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.22l-2.9-2.25c-.8.54-1.84.87-3.06.87-2.35 0-4.33-1.58-5.04-3.71H.92v2.32C2.4 15.93 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.96 10.69c-.18-.54-.28-1.12-.28-1.69s.1-1.15.28-1.69V4.99H.92A8.977 8.977 0 0 0 0 9c0 1.47.36 2.89.92 4.16l3.04-2.47z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.4C13.46.98 11.42 0 9 0 5.48 0 2.4 2.07.92 4.99l3.04 2.32c.71-2.13 2.69-3.71 5.04-3.71z"/></svg>
-                    Sign in with Google
-                </button>
+            <div class="logo">di-wallet</div>
+            <div class="header-actions">
+                <div id="auth-status">
+                    <button class="auth-btn" onclick="login()">login</button>
+                </div>
+                <button class="settings-btn" onclick="toggleModal(true)">⚙️</button>
             </div>
         </header>
 
-        <div class="main-card">
-            <h2>Add Daily Expense</h2>
-            
-            <div class="filters">
-                <div class="form-group">
-                    <label>Year</label>
-                    <select id="input-year" onchange="updateDays()"></select>
-                </div>
-                <div class="form-group">
-                    <label>Month</label>
-                    <select id="input-month" onchange="updateDays()"></select>
-                </div>
-            </div>
-
-            <div class="filters" style="grid-template-columns: 1fr;">
-                <div class="form-group">
-                    <label>Day (ရက်စွဲ)</label>
-                    <select id="input-day"></select>
-                </div>
-            </div>
-
-            <div class="grid-inputs">
-                <div class="form-group">
-                    <label>Breakfast 🍳</label>
-                    <input type="number" id="amt-breakfast" class="category-input cat-breakfast" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>Lunch 🍛</label>
-                    <input type="number" id="amt-lunch" class="category-input cat-lunch" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>Dinner 🍲</label>
-                    <input type="number" id="amt-dinner" class="category-input cat-dinner" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>Other ⚡</label>
-                    <input type="number" id="amt-other" class="category-input cat-other" placeholder="0">
-                </div>
-            </div>
-
-            <button class="btn-save" onclick="saveData()">Save Daily Entry</button>
-            <div id="sync-status" class="sync-status">Saved locally (Sign in to sync with Google Drive)</div>
+        <div class="tabs">
+            <button id="tab-input" class="tab-btn active" onclick="switchTab('input')">input</button>
+            <button id="tab-month" class="tab-btn" onclick="switchTab('month')">this month</button>
         </div>
 
-        <div class="history-section">
-            <h2>View History / ဇယားပြန်ကြည့်ရန်</h2>
+        <div id="panel-input" class="view-panel active">
+            <div class="card">
+                <div class="form-group">
+                    <label>day (ရက်စွဲ)</label>
+                    <select id="inp-day"></select>
+                </div>
+                <div class="grid-inputs">
+                    <div class="form-group">
+                        <label class="txt-bf">breakfast</label>
+                        <input type="number" id="inp-bf" class="input-bf" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="txt-lh">lunch</label>
+                        <input type="number" id="inp-lh" class="input-lh" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="txt-dn">dinner</label>
+                        <input type="number" id="inp-dn" class="input-dn" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="txt-ot">other</label>
+                        <input type="number" id="inp-ot" class="input-ot" placeholder="0">
+                    </div>
+                </div>
+                <button class="btn-main" onclick="saveTodayEntry()">save entry</button>
+            </div>
+            <div id="sync-info" class="status-bar">local storage mode</div>
+        </div>
+
+        <div id="panel-month" class="view-panel">
+            <div class="card">
+                <span id="month-title" style="font-weight: bold; color: var(--primary);"></span>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-date">date</th>
+                                <th class="col-amt txt-bf">bf</th>
+                                <th class="col-amt txt-lh">lh</th>
+                                <th class="col-amt txt-dn">dn</th>
+                                <th class="col-amt txt-ot">ot</th>
+                                <th class="col-tot">total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="month-table-body"></tbody>
+                    </table>
+                </div>
+                <div class="total-box">
+                    <span>total:</span>
+                    <span id="month-total-amt" style="color: var(--primary);">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span style="font-weight: bold; color: var(--primary);">settings / history archive</span>
+                <button class="close-btn" onclick="toggleModal(false)">✕</button>
+            </div>
             
-            <div class="filters">
-                <div class="form-group">
-                    <label>History Year</label>
-                    <select id="history-year" onchange="renderHistory()"></select>
+            <div class="card" style="padding: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div class="form-group" style="margin:0;">
+                    <label>year</label>
+                    <select id="hist-year" onchange="renderHistory()"></select>
                 </div>
-                <div class="form-group">
-                    <label>History Month</label>
-                    <select id="history-month" onchange="renderHistory()"></select>
+                <div class="form-group" style="margin:0;">
+                    <label>month</label>
+                    <select id="hist-month" onchange="renderHistory()"></select>
                 </div>
             </div>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Breakfast</th>
-                            <th>Lunch</th>
-                            <th>Dinner</th>
-                            <th>Other</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-table-body">
-                        </tbody>
-                </table>
-            </div>
-
-            <div class="total-box">
-                <span>Monthly Total Amount:</span>
-                <span id="monthly-total" style="color: var(--primary);">0 MMK</span>
+            <div class="card" style="flex: 1; max-height: 280px; overflow-y: auto; padding: 8px;">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-date">date</th>
+                                <th class="col-amt txt-bf">bf</th>
+                                <th class="col-amt txt-lh">lh</th>
+                                <th class="col-amt txt-dn">dn</th>
+                                <th class="col-amt txt-ot">ot</th>
+                                <th class="col-tot">total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hist-table-body"></tbody>
+                    </table>
+                </div>
+                <div class="total-box">
+                    <span>selected month total:</span>
+                    <span id="hist-total-amt" style="color: var(--primary);">0</span>
+                </div>
             </div>
         </div>
     </div>
@@ -340,163 +396,206 @@
     <script src="https://apis.google.com/js/api.js" async defer></script>
 
     <script>
-        // 🔑 သင့်ထံမှ ရလာသော Client ID နှင့် API Key အားလုံးကို ထည့်သွင်းပေးထားပြီးဖြစ်သည်
-        let CLIENT_ID = '987816810795-h2b2hgj09mvio7q0allbbbvbl3pr2eft.apps.googleusercontent.com'; 
-        let API_KEY = 'AIzaSyAVtF5zU018e045X55beE7T_npSA3gozrs';
+        const CLIENT_ID = '987816810795-h2b2hgj09mvio7q0allbbbvbl3pr2eft.apps.googleusercontent.com'; 
+        const API_KEY = 'AIzaSyAVtF5zU018e045X55beE7T_npSA3gozrs';
         
-        let DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
-        let SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+        const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
 
         let expenseData = JSON.parse(localStorage.getItem('di_wallet_data')) || {};
-        let isLoggedIn = false;
-
-        const monthsMyanmar = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let tokenClient;
+        let googleAccessToken = null;
+        let backupFileId = null;
 
         window.onload = function() {
-            initYearMonthSelectors();
-            updateDays();
-            renderHistory();
+            initSelectors();
+            setupDayDropdown();
+            renderCurrentMonthTable();
+            gapiLoad();
+            gisLoad();
         };
 
-        function initYearMonthSelectors() {
+        function initSelectors() {
             const currentYear = new Date().getFullYear();
-            const currentMonth = new Date().getMonth() + 1;
+            const ySelect = document.getElementById('hist-year');
+            const mSelect = document.getElementById('hist-month');
 
-            const inputYear = document.getElementById('input-year');
-            const historyYear = document.getElementById('history-year');
-            const inputMonth = document.getElementById('input-month');
-            const historyMonth = document.getElementById('history-month');
-
-            for (let y = currentYear - 5; y <= currentYear + 2; y++) {
-                inputYear.add(new Option(y, y));
-                historyYear.add(new Option(y, y));
+            for (let y = currentYear - 3; y <= currentYear + 1; y++) {
+                ySelect.add(new Option(y, y));
             }
-            inputYear.value = currentYear;
-            historyYear.value = currentYear;
+            ySelect.value = currentYear;
 
-            monthsMyanmar.forEach((m, idx) => {
-                inputMonth.add(new Option(m, idx + 1));
-                historyMonth.add(new Option(m, idx + 1));
-            });
-            inputMonth.value = currentMonth;
-            historyMonth.value = currentMonth;
+            for (let m = 1; m <= 12; m++) {
+                mSelect.add(new Option(String(m).padStart(2, '0'), m));
+            }
+            mSelect.value = new Date().getMonth() + 1;
         }
 
-        function getDaysInMonth(year, month) {
-            return new Date(year, month, 0).getDate();
-        }
-
-        function updateDays() {
-            const year = parseInt(document.getElementById('input-year').value);
-            const month = parseInt(document.getElementById('input-month').value);
-            const daySelect = document.getElementById('input-day');
-            
-            const totalDays = getDaysInMonth(year, month);
-            const currentSelected = daySelect.value;
-
+        function setupDayDropdown() {
+            const now = new Date();
+            const totalDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const daySelect = document.getElementById('inp-day');
             daySelect.innerHTML = '';
             for (let d = 1; d <= totalDays; d++) {
-                daySelect.add(new Option(`Day ${d}`, d));
+                daySelect.add(new Option(`day ${d}`, d));
             }
+            daySelect.value = now.getDate();
+        }
 
-            if (currentSelected && currentSelected <= totalDays) {
-                daySelect.value = currentSelected;
+        function switchTab(tab) {
+            document.getElementById('tab-input').classList.remove('active');
+            document.getElementById('tab-month').classList.remove('active');
+            document.getElementById('panel-input').classList.remove('active');
+            document.getElementById('panel-month').classList.remove('active');
+
+            if (tab === 'input') {
+                document.getElementById('tab-input').classList.add('active');
+                document.getElementById('panel-input').classList.add('active');
             } else {
-                daySelect.value = 1;
+                document.getElementById('tab-month').classList.add('active');
+                document.getElementById('panel-month').classList.add('active');
+                renderCurrentMonthTable();
             }
         }
 
-        function saveData() {
-            const year = document.getElementById('input-year').value;
-            const month = String(document.getElementById('input-month').value).padStart(2, '0');
-            const day = String(document.getElementById('input-day').value).padStart(2, '0');
-
-            const bf = parseFloat(document.getElementById('amt-breakfast').value) || 0;
-            const lh = parseFloat(document.getElementById('amt-lunch').value) || 0;
-            const dn = parseFloat(document.getElementById('amt-dinner').value) || 0;
-            const ot = parseFloat(document.getElementById('amt-other').value) || 0;
-
-            const dateKey = `${year}-${month}-${day}`;
-
-            expenseData[dateKey] = {
-                breakfast: bf,
-                lunch: lh,
-                dinner: dn,
-                other: ot,
-                total: bf + lh + dn + ot
-            };
-
-            localStorage.setItem('di_wallet_data', JSON.stringify(expenseData));
-            
-            document.getElementById('amt-breakfast').value = '';
-            document.getElementById('amt-lunch').value = '';
-            document.getElementById('amt-dinner').value = '';
-            document.getElementById('amt-other').value = '';
-
-            renderHistory();
-            
-            if (isLoggedIn) {
-                uploadToGoogleDrive();
+        function toggleModal(show) {
+            const modal = document.getElementById('settings-modal');
+            if (show) {
+                modal.classList.add('active');
+                renderHistory();
             } else {
-                showSyncStatus("Saved locally!");
+                modal.classList.remove('active');
             }
+        }
+
+        function saveTodayEntry() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(document.getElementById('inp-day').value).padStart(2, '0');
+            
+            const key = `${year}-${month}-${day}`;
+            
+            const bf = parseFloat(document.getElementById('inp-bf').value) || 0;
+            const lh = parseFloat(document.getElementById('inp-lh').value) || 0;
+            const dn = parseFloat(document.getElementById('inp-dn').value) || 0;
+            const ot = parseFloat(document.getElementById('inp-ot').value) || 0;
+
+            expenseData[key] = { bf, lh, dn, ot, tot: bf + lh + dn + ot };
+            localStorage.setItem('di_wallet_data', JSON.stringify(expenseData));
+
+            document.getElementById('inp-bf').value = '';
+            document.getElementById('inp-lh').value = '';
+            document.getElementById('inp-dn').value = '';
+            document.getElementById('inp-ot').value = '';
+
+            updateSyncStatus("saved locally!");
+            if (googleAccessToken) {
+                uploadToCloud();
+            }
+        }
+
+        function renderCurrentMonthTable() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            document.getElementById('month-title').innerText = `current month: ${year}-${month}`;
+            
+            buildTable(year, month, 'month-table-body', 'month-total-amt');
         }
 
         function renderHistory() {
-            const year = document.getElementById('history-year').value;
-            const month = String(document.getElementById('history-month').value).padStart(2, '0');
-            const tbody = document.getElementById('history-table-body');
-            
+            const year = document.getElementById('hist-year').value;
+            const month = String(document.getElementById('hist-month').value).padStart(2, '0');
+            buildTable(year, month, 'hist-table-body', 'hist-total-amt');
+        }
+
+        function buildTable(year, month, tbodyId, totalId) {
+            const tbody = document.getElementById(tbodyId);
             tbody.innerHTML = '';
             let grandTotal = 0;
+            const totalDays = new Date(year, parseInt(month), 0).getDate();
 
-            const daysInMonth = getDaysInMonth(parseInt(year), parseInt(month));
-
-            for (let d = 1; d <= daysInMonth; d++) {
+            for (let d = 1; d <= totalDays; d++) {
                 const dayStr = String(d).padStart(2, '0');
-                const dateKey = `${year}-${month}-${dayStr}`;
-                const record = expenseData[dateKey] || { breakfast: 0, lunch: 0, dinner: 0, other: 0, total: 0 };
+                const key = `${year}-${month}-${dayStr}`;
+                const r = expenseData[key] || { bf: 0, lh: 0, dn: 0, ot: 0, tot: 0 };
 
-                grandTotal += record.total;
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight:600;">Day ${d}</td>
-                    <td><span class="${record.breakfast ? 'badge bg-breakfast' : ''}">${record.breakfast || '-'}</span></td>
-                    <td><span class="${record.lunch ? 'badge bg-lunch' : ''}">${record.lunch || '-'}</span></td>
-                    <td><span class="${record.dinner ? 'badge bg-dinner' : ''}">${record.dinner || '-'}</span></td>
-                    <td><span class="${record.other ? 'badge bg-other' : ''}">${record.other || '-'}</span></td>
-                    <td style="font-weight:600; color: ${record.total ? 'var(--primary)' : 'var(--text-muted)'}">${record.total || '-'}</td>
-                `;
-                tbody.appendChild(tr);
+                if (r.tot > 0) {
+                    grandTotal += r.tot;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="col-date">${dayStr}</td>
+                        <td class="col-amt txt-bf">${r.bf || '-'}</td>
+                        <td class="col-amt txt-lh">${r.lh || '-'}</td>
+                        <td class="col-amt txt-dn">${r.dn || '-'}</td>
+                        <td class="col-amt txt-ot">${r.ot || '-'}</td>
+                        <td class="col-tot">${r.tot}</td>
+                    `;
+                    tbody.appendChild(tr);
+                }
             }
-
-            document.getElementById('monthly-total').innerText = grandTotal.toLocaleString() + " MMK";
+            document.getElementById(totalId).innerText = grandTotal.toLocaleString();
         }
 
-        function showSyncStatus(msg) {
-            document.getElementById('sync-status').innerText = msg;
+        function updateSyncStatus(msg) {
+            document.getElementById('sync-info').innerText = msg;
         }
 
-        function handleAuthClick() {
-            isLoggedIn = true;
-            document.getElementById('auth-area').innerHTML = `
-                <div class="user-profile">
-                    <div style="text-align:right">
-                        <div style="font-size:13px; font-weight:600;">Connected User</div>
-                        <div style="font-size:11px; color:var(--primary)">Google Drive Active</div>
-                    </div>
-                    <div class="user-avatar" style="background: var(--primary); display:grid; place-items:center; font-weight:bold; color:var(--bg-color)">U</div>
-                </div>
-            `;
-            showSyncStatus("Connected to Google Account. Data synchronized.");
+        /* --- Google Cloud App Storage Real Logic --- */
+        function gapiLoad() { gapi.load('client', initGapi); }
+        async function initGapi() { await gapi.client.init({ apiKey: API_KEY, discoveryDocs: [DISCOVERY_DOC] }); }
+        function gisLoad() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID, scope: SCOPES, callback: (resp) => {
+                    if (resp.error) return;
+                    googleAccessToken = resp.access_token;
+                    document.getElementById('auth-status').innerHTML = '<div class="user-info">☁️ cloud synced</div>';
+                    syncWithCloud();
+                }
+            });
+        }
+        function login() { tokenClient.requestAccessToken({ prompt: 'consent' }); }
+
+        async function syncWithCloud() {
+            updateSyncStatus("connecting cloud storage...");
+            try {
+                const response = await gapi.client.drive.files.list({ q: "name='di_wallet_backup.json' and spaces='appDataFolder'", fields: 'files(id)' });
+                const files = response.result.files;
+                if (files && files.length > 0) {
+                    backupFileId = files[0].id;
+                    const fileContent = await gapi.client.drive.files.get({ fileId: backupFileId, alt: 'media' });
+                    if (fileContent.result) {
+                        expenseData = Object.assign(fileContent.result, expenseData);
+                        localStorage.setItem('di_wallet_data', JSON.stringify(expenseData));
+                        renderCurrentMonthTable();
+                    }
+                }
+                uploadToCloud();
+            } catch (err) { updateSyncStatus("cloud sync failed."); }
         }
 
-        function uploadToGoogleDrive() {
-            showSyncStatus("Syncing with Google Drive storage...");
-            setTimeout(() => {
-                showSyncStatus("Google Drive Sync completed successfully.");
-            }, 800);
+        async function uploadToCloud() {
+            updateSyncStatus("uploading backup...");
+            const blob = new Blob([JSON.stringify(expenseData)], { type: 'application/json' });
+            try {
+                if (backupFileId) {
+                    await gapi.client.request({
+                        path: `/upload/drive/v3/files/${backupFileId}`, method: 'PATCH',
+                        params: { uploadType: 'media' }, body: JSON.stringify(expenseData)
+                    });
+                } else {
+                    const metadata = { name: 'di_wallet_backup.json', parents: ['appDataFolder'] };
+                    const form = new FormData();
+                    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                    form.append('file', blob);
+                    await gapi.client.request({
+                        path: '/upload/drive/v3/files', method: 'POST',
+                        params: { uploadType: 'multipart' }, body: form
+                    });
+                }
+                updateSyncStatus("cloud storage active (all backup synced)");
+            } catch (e) { updateSyncStatus("backup update failed."); }
         }
     </script>
 </body>
