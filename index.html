@@ -73,6 +73,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            text-transform: lowercase;
         }
 
         .user-info {
@@ -91,7 +92,6 @@
             cursor: pointer;
         }
 
-        /* tab navigation */
         .tabs {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -180,7 +180,6 @@
             margin-top: 4px;
         }
 
-        /* table view styles (compact & no horizontal scroll) */
         .table-wrapper {
             overflow-x: hidden;
             margin-top: 4px;
@@ -229,7 +228,6 @@
             text-transform: lowercase;
         }
 
-        /* modal settings view */
         .modal {
             display: none;
             position: fixed;
@@ -392,27 +390,22 @@
         </div>
     </div>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://apis.google.com/js/api.js" async defer></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
 
     <script>
         const CLIENT_ID = '987816810795-h2b2hgj09mvio7q0allbbbvbl3pr2eft.apps.googleusercontent.com'; 
         const API_KEY = 'AIzaSyAVtF5zU018e045X55beE7T_npSA3gozrs';
         
-        const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
-        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
-
         let expenseData = JSON.parse(localStorage.getItem('di_wallet_data')) || {};
         let tokenClient;
-        let googleAccessToken = null;
+        let accessToken = null;
         let backupFileId = null;
 
         window.onload = function() {
             initSelectors();
             setupDayDropdown();
             renderCurrentMonthTable();
-            gapiLoad();
-            gisLoad();
+            initTokenClient();
         };
 
         function initSelectors() {
@@ -426,9 +419,9 @@
             ySelect.value = currentYear;
 
             for (let m = 1; m <= 12; m++) {
-                mSelect.add(new Option(String(m).padStart(2, '0'), m));
+                mSelect.add(new Option(String(m).padStart(2, '0'), String(m).padStart(2, '0')));
             }
-            mSelect.value = new Date().getMonth() + 1;
+            mSelect.value = String(new Date().getMonth() + 1).padStart(2, '0');
         }
 
         function setupDayDropdown() {
@@ -490,7 +483,7 @@
             document.getElementById('inp-ot').value = '';
 
             updateSyncStatus("saved locally!");
-            if (googleAccessToken) {
+            if (accessToken) {
                 uploadToCloud();
             }
         }
@@ -500,13 +493,12 @@
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             document.getElementById('month-title').innerText = `current month: ${year}-${month}`;
-            
             buildTable(year, month, 'month-table-body', 'month-total-amt');
         }
 
         function renderHistory() {
             const year = document.getElementById('hist-year').value;
-            const month = String(document.getElementById('hist-month').value).padStart(2, '0');
+            const month = document.getElementById('hist-month').value;
             buildTable(year, month, 'hist-table-body', 'hist-total-amt');
         }
 
@@ -519,9 +511,9 @@
             for (let d = 1; d <= totalDays; d++) {
                 const dayStr = String(d).padStart(2, '0');
                 const key = `${year}-${month}-${dayStr}`;
-                const r = expenseData[key] || { bf: 0, lh: 0, dn: 0, ot: 0, tot: 0 };
+                const r = expenseData[key];
 
-                if (r.tot > 0) {
+                if (r && r.tot > 0) {
                     grandTotal += r.tot;
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -542,60 +534,93 @@
             document.getElementById('sync-info').innerText = msg;
         }
 
-        /* --- Google Cloud App Storage Real Logic --- */
-        function gapiLoad() { gapi.load('client', initGapi); }
-        async function initGapi() { await gapi.client.init({ apiKey: API_KEY, discoveryDocs: [DISCOVERY_DOC] }); }
-        function gisLoad() {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID, scope: SCOPES, callback: (resp) => {
-                    if (resp.error) return;
-                    googleAccessToken = resp.access_token;
-                    document.getElementById('auth-status').innerHTML = '<div class="user-info">☁️ cloud synced</div>';
-                    syncWithCloud();
-                }
-            });
+        /* --- ☁️ Fix Google Drive Direct API Logic --- */
+        function initTokenClient() {
+            try {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CLIENT_ID,
+                    scope: 'https://www.googleapis.com/auth/drive.appdata',
+                    callback: async (resp) => {
+                        if (resp.error) {
+                            updateSyncStatus("login failed: " + resp.error);
+                            return;
+                        }
+                        accessToken = resp.access_token;
+                        document.getElementById('auth-status').innerHTML = '<div class="user-info">☁️ cloud synced</div>';
+                        await syncWithCloud();
+                    }
+                });
+            } catch (e) {
+                console.error(e);
+            }
         }
-        function login() { tokenClient.requestAccessToken({ prompt: 'consent' }); }
+
+        function login() {
+            if (tokenClient) {
+                tokenClient.requestAccessToken({ prompt: '' });
+            }
+        }
 
         async function syncWithCloud() {
-            updateSyncStatus("connecting cloud storage...");
+            updateSyncStatus("searching app storage...");
             try {
-                const response = await gapi.client.drive.files.list({ q: "name='di_wallet_backup.json' and spaces='appDataFolder'", fields: 'files(id)' });
-                const files = response.result.files;
-                if (files && files.length > 0) {
-                    backupFileId = files[0].id;
-                    const fileContent = await gapi.client.drive.files.get({ fileId: backupFileId, alt: 'media' });
-                    if (fileContent.result) {
-                        expenseData = Object.assign(fileContent.result, expenseData);
+                // 1. App Data Folder ထဲမှာ ဖိုင်ရှိမရှိ အရင်ရှာမယ်
+                let searchUrl = `https://www.googleapis.com/drive/v3/files?q=name='di_wallet_backup.json'+and+spaces='appDataFolder'&key=${API_KEY}`;
+                let res = await fetch(searchUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+                let data = await res.json();
+                
+                if (data.files && data.files.length > 0) {
+                    backupFileId = data.files[0].id;
+                    updateSyncStatus("downloading cloud backup...");
+                    
+                    // 2. ဖိုင်ရှိရင် ဒေါင်းလုဒ်ဆွဲပြီး လက်ရှိ data နဲ့ ပေါင်းမယ်
+                    let downloadUrl = `https://www.googleapis.com/drive/v3/files/${backupFileId}?alt=media&key=${API_KEY}`;
+                    let fileRes = await fetch(downloadUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+                    let cloudData = await fileRes.json();
+                    
+                    if (cloudData) {
+                        expenseData = Object.assign(cloudData, expenseData);
                         localStorage.setItem('di_wallet_data', JSON.stringify(expenseData));
                         renderCurrentMonthTable();
                     }
                 }
-                uploadToCloud();
-            } catch (err) { updateSyncStatus("cloud sync failed."); }
+                await uploadToCloud();
+            } catch (err) {
+                updateSyncStatus("cloud sync failed.");
+            }
         }
 
         async function uploadToCloud() {
             updateSyncStatus("uploading backup...");
-            const blob = new Blob([JSON.stringify(expenseData)], { type: 'application/json' });
             try {
                 if (backupFileId) {
-                    await gapi.client.request({
-                        path: `/upload/drive/v3/files/${backupFileId}`, method: 'PATCH',
-                        params: { uploadType: 'media' }, body: JSON.stringify(expenseData)
+                    // Update existing file
+                    let url = `https://www.googleapis.com/upload/drive/v3/files/${backupFileId}?uploadType=media&key=${API_KEY}`;
+                    await fetch(url, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(expenseData)
                     });
                 } else {
-                    const metadata = { name: 'di_wallet_backup.json', parents: ['appDataFolder'] };
-                    const form = new FormData();
+                    // Create new file inside appDataFolder
+                    let metadata = { name: 'di_wallet_backup.json', parents: ['appDataFolder'] };
+                    let form = new FormData();
                     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-                    form.append('file', blob);
-                    await gapi.client.request({
-                        path: '/upload/drive/v3/files', method: 'POST',
-                        params: { uploadType: 'multipart' }, body: form
+                    form.append('file', new Blob([JSON.stringify(expenseData)], { type: 'application/json' }));
+
+                    let url = `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&key=${API_KEY}`;
+                    let createRes = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${accessToken}` },
+                        body: form
                     });
+                    let createData = await createRes.json();
+                    if (createData.id) backupFileId = createData.id;
                 }
                 updateSyncStatus("cloud storage active (all backup synced)");
-            } catch (e) { updateSyncStatus("backup update failed."); }
+            } catch (e) {
+                updateSyncStatus("backup update failed.");
+            }
         }
     </script>
 </body>
