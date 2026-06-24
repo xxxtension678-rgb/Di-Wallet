@@ -340,9 +340,9 @@
     <script src="https://apis.google.com/js/api.js" async defer></script>
 
     <script>
-        // ⚠️ ဒီနေရာမှာ Google Cloud က ရလာမယ့် Key နှစ်ခုကို အစားထိုးထည့်ပေးပါ
-        let CLIENT_ID = ''; 
-        let API_KEY = '';
+        // 🔑 သင့်ထံမှ ရလာသော Client ID နှင့် API Key အားလုံးကို ထည့်သွင်းပေးထားပြီးဖြစ်သည်
+        let CLIENT_ID = '987816810795-h2b2hgj09mvio7q0allbbbvbl3pr2eft.apps.googleusercontent.com'; 
+        let API_KEY = 'AIzaSyAVtF5zU018e045X55beE7T_npSA3gozrs';
         
         let DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
         let SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
@@ -382,7 +382,6 @@
             historyMonth.value = currentMonth;
         }
 
-        // လအလိုက် ရက်အရေအတွက် အမှန်တွက်ပေးသည့် Logic
         function getDaysInMonth(year, month) {
             return new Date(year, month, 0).getDate();
         }
@@ -479,7 +478,6 @@
             document.getElementById('sync-status').innerText = msg;
         }
 
-        // Google SignIn Handling Flow
         function handleAuthClick() {
             isLoggedIn = true;
             document.getElementById('auth-area').innerHTML = `
