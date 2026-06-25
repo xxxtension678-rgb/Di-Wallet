@@ -282,7 +282,7 @@
             <div class="logo">di-wallet</div>
             <div class="header-actions">
                 <div id="auth-status">
-                    <button class="auth-btn" onclick="login()">login</button>
+                    <button class="auth-btn" id="login-btn" onclick="handleAuthClick()" style="display:none;">login</button>
                 </div>
                 <button class="settings-btn" onclick="toggleModal(true)">⚙️</button>
             </div>
@@ -319,7 +319,7 @@
                 </div>
                 <button class="btn-main" onclick="saveTodayEntry()">save entry</button>
             </div>
-            <div id="sync-info" class="status-bar">local storage mode</div>
+            <div id="sync-info" class="status-bar">initializing google API...</div>
         </div>
 
         <div id="panel-month" class="view-panel">
@@ -390,22 +390,25 @@
         </div>
     </div>
 
-    <script src="https://accounts.google.com/gsi/client"></script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
     <script>
         const CLIENT_ID = '987816810795-h2b2hgj09mvio7q0allbbbvbl3pr2eft.apps.googleusercontent.com'; 
         const API_KEY = 'AIzaSyAVtF5zU018e045X55beE7T_npSA3gozrs';
+        const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
         
         let expenseData = JSON.parse(localStorage.getItem('di_wallet_data')) || {};
         let tokenClient;
-        let accessToken = null;
+        let gapiInited = false;
+        let gisInited = false;
         let backupFileId = null;
 
         window.onload = function() {
             initSelectors();
             setupDayDropdown();
             renderCurrentMonthTable();
-            initTokenClient();
         };
 
         function initSelectors() {
@@ -483,7 +486,7 @@
             document.getElementById('inp-ot').value = '';
 
             updateSyncStatus("saved locally!");
-            if (accessToken) {
+            if (gapi.client.getToken()) {
                 uploadToCloud();
             }
         }
@@ -534,48 +537,74 @@
             document.getElementById('sync-info').innerText = msg;
         }
 
-        /* --- ☁️ Google Drive Direct API Logic --- */
-        function initTokenClient() {
-            try {
-                tokenClient = google.accounts.oauth2.initTokenClient({
-                    client_id: CLIENT_ID,
-                    scope: 'https://www.googleapis.com/auth/drive.appdata',
-                    callback: async (resp) => {
-                        if (resp.error) {
-                            updateSyncStatus("login failed: " + resp.error);
-                            return;
-                        }
-                        accessToken = resp.access_token;
-                        document.getElementById('auth-status').innerHTML = '<div class="user-info">☁️ cloud synced</div>';
-                        await syncWithCloud();
-                    }
-                });
-            } catch (e) {
-                console.error(e);
+        /* --- ☁️ Correct Official Google Drive API Client Logic --- */
+        function gapiLoaded() {
+            gapi.load('client', initializeGapiClient);
+        }
+
+        async function initializeGapiClient() {
+            await gapi.client.init({
+                apiKey: API_KEY,
+                discoveryDocs: [DISCOVERY_DOC],
+            });
+            gapiInited = true;
+            maybeEnableButtons();
+        }
+
+        function gisLoaded() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                ux_mode: 'popup',
+                callback: '', // defined dynamically during invocation
+            });
+            gisInited = true;
+            maybeEnableButtons();
+        }
+
+        function maybeEnableButtons() {
+            if (gapiInited && gisInited) {
+                document.getElementById('login-btn').style.display = 'block';
+                updateSyncStatus("local storage mode (ready to sync)");
             }
         }
 
-        function login() {
-            if (tokenClient) {
-                tokenClient.requestAccessToken({ prompt: '' });
+        function handleAuthClick() {
+            tokenClient.callback = async (resp) => {
+                if (resp.error !== undefined) {
+                    throw (resp);
+                }
+                document.getElementById('auth-status').innerHTML = '<div class="user-info">☁️ cloud synced</div>';
+                await syncWithCloud();
+            };
+
+            if (gapi.client.getToken() === null) {
+                tokenClient.requestAccessToken({prompt: 'consent'});
+            } else {
+                tokenClient.requestAccessToken({prompt: ''});
             }
         }
 
         async function syncWithCloud() {
-            updateSyncStatus("searching app storage...");
+            updateSyncStatus("searching cloud backup...");
             try {
-                let searchUrl = `https://www.googleapis.com/drive/v3/files?q=name='di_wallet_backup.json'+and+spaces='appDataFolder'&key=${API_KEY}`;
-                let res = await fetch(searchUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
-                let data = await res.json();
+                let response = await gapi.client.drive.files.list({
+                    q: "name='di_wallet_backup.json' and spaces='appDataFolder'",
+                    spaces: 'appDataFolder',
+                    fields: 'files(id, name)'
+                });
                 
-                if (data.files && data.files.length > 0) {
-                    backupFileId = data.files[0].id;
-                    updateSyncStatus("downloading cloud backup...");
+                let files = response.result.files;
+                if (files && files.length > 0) {
+                    backupFileId = files[0].id;
+                    updateSyncStatus("downloading cloud data...");
                     
-                    let downloadUrl = `https://www.googleapis.com/drive/v3/files/${backupFileId}?alt=media&key=${API_KEY}`;
-                    let fileRes = await fetch(downloadUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
-                    let cloudData = await fileRes.json();
+                    let fileRes = await gapi.client.drive.files.get({
+                        fileId: backupFileId,
+                        alt: 'media'
+                    });
                     
+                    let cloudData = fileRes.result;
                     if (cloudData) {
                         expenseData = Object.assign(cloudData, expenseData);
                         localStorage.setItem('di_wallet_data', JSON.stringify(expenseData));
@@ -584,6 +613,7 @@
                 }
                 await uploadToCloud();
             } catch (err) {
+                console.error(err);
                 updateSyncStatus("cloud sync failed.");
             }
         }
@@ -592,29 +622,38 @@
             updateSyncStatus("uploading backup...");
             try {
                 if (backupFileId) {
-                    let url = `https://www.googleapis.com/upload/drive/v3/files/${backupFileId}?uploadType=media&key=${API_KEY}`;
-                    await fetch(url, {
+                    // Update existing backup
+                    await gapi.client.request({
+                        path: '/upload/drive/v3/files/' + backupFileId,
                         method: 'PATCH',
-                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        params: { uploadType: 'media' },
                         body: JSON.stringify(expenseData)
                     });
                 } else {
-                    let metadata = { name: 'di_wallet_backup.json', parents: ['appDataFolder'] };
-                    let form = new FormData();
-                    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-                    form.append('file', new Blob([JSON.stringify(expenseData)], { type: 'application/json' }));
-
-                    let url = `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&key=${API_KEY}`;
-                    let createRes = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${accessToken}` },
-                        body: form
+                    // Create new file metadata inside appDataFolder
+                    let metadata = {
+                        name: 'di_wallet_backup.json',
+                        parents: ['appDataFolder']
+                    };
+                    
+                    let response = await gapi.client.drive.files.create({
+                        resource: metadata,
+                        fields: 'id'
                     });
-                    let createData = await createRes.json();
-                    if (createData.id) backupFileId = createData.id;
+                    
+                    backupFileId = response.result.id;
+                    
+                    // Upload the payload media
+                    await gapi.client.request({
+                        path: '/upload/drive/v3/files/' + backupFileId,
+                        method: 'PATCH',
+                        params: { uploadType: 'media' },
+                        body: JSON.stringify(expenseData)
+                    });
                 }
                 updateSyncStatus("cloud storage active (all backup synced)");
             } catch (e) {
+                console.error(e);
                 updateSyncStatus("backup update failed.");
             }
         }
