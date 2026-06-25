@@ -458,9 +458,14 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const provider = new firebase.auth.GoogleAuthProvider();
+    // လိုင်းနံပါတ် ၄၆၁ နေရာမှာ ဒီကုဒ်ကို အစားထိုးထည့်ပေးလိုက်ပါဗျာ
+const provider = new firebase.auth.GoogleAuthProvider();
 
-    let currentUser = null;
+provider.setCustomParameters({
+  client_id: "393481838636-47anq9kt393u1356j0ol9lfjk96jrkjq.apps.googleusercontent.com"
+});
+
+let currentUser = null;
     let today = new Date();
     let currentYear = today.getFullYear();
     let currentMonth = today.getMonth() + 1;
