@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>di-wallet</title>
+  <title>Di-Wallet</title>
   
+  <!-- Firebase SDKs (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -32,7 +33,6 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       font-family: monospace;
-      text-transform: lowercase;
       padding: 16px;
       display: flex;
       justify-content: center;
@@ -42,7 +42,7 @@
 
     .phone-container {
       width: 100%;
-      max-width: 412px; /* standard mobile view width */
+      max-width: 412px;
       background: var(--surface-color);
       border: 1px solid var(--border-color);
       border-radius: 24px;
@@ -67,36 +67,50 @@
       letter-spacing: -0.5px;
     }
 
-    .settings-trigger {
-      background: var(--surface-card);
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
+    /* Premium Profile Button */
+    .profile-widget-trigger {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      background: none;
+      border: none;
       cursor: pointer;
-      font-size: 1.2rem;
-      transition: all 0.2s;
+      outline: none;
     }
 
-    .settings-trigger:hover {
-      background: var(--border-color);
+    .profile-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid var(--border-color);
+      object-fit: cover;
+      transition: border-color 0.2s;
+    }
+
+    .profile-widget-trigger:hover .profile-avatar {
+      border-color: var(--primary-color);
+    }
+
+    .profile-name {
+      font-family: monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+      max-width: 70px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* Screen display control */
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* Auth View styling */
     .auth-screen {
       text-align: center;
       padding: 60px 0;
     }
 
-    /* Inputs and Forms styling (Reference 426/427 style) */
     .input-field {
       width: 100%;
       padding: 12px 16px;
@@ -107,14 +121,13 @@
       border-radius: 12px;
       outline: none;
       font-size: 1rem;
-      transition: border-color 0.2s;
     }
 
     .input-field:focus {
       border-color: var(--primary-color);
     }
 
-    /* Display Widgets / Cards */
+    /* Display Cards */
     .status-widget {
       background: var(--surface-card);
       border-radius: 16px;
@@ -132,9 +145,8 @@
 
     .widget-row:last-child { margin-bottom: 0; }
     .widget-label { color: var(--text-dim); }
-    .widget-value { font-weight: bold; }
 
-    /* Custom Grid Layout from Sketch */
+    /* Meal Form Grid Layout */
     .meal-grid {
       background: var(--surface-card);
       border-radius: 16px;
@@ -145,23 +157,33 @@
 
     .grid-row {
       display: grid;
-      grid-template-columns: 100px 1fr;
+      grid-template-columns: 90px 1fr;
       align-items: center;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .grid-row:last-child { margin-bottom: 0; }
-    .grid-label { color: var(--text-color); }
+    
+    /* Live dynamic indicators under inputs */
+    .live-badge {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+      padding-left: 2px;
+    }
+    .live-badge span {
+      color: var(--secondary-color);
+    }
 
-    /* Premium Overlay Panel (Reference 429/430 menu style) */
+    /* Premium Overlay Panel */
     .overlay-menu {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(15, 15, 17, 0.95);
+      background: rgba(15, 15, 17, 0.96);
       backdrop-filter: blur(8px);
       z-index: 100;
       padding: 24px;
@@ -197,7 +219,6 @@
       text-align: left;
       font-family: monospace;
       font-size: 1rem;
-      transition: all 0.2s;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -206,6 +227,47 @@
     .menu-item:hover {
       background: var(--border-color);
       border-color: var(--primary-color);
+    }
+
+    /* Structured Archive Table */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--surface-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      margin-top: 16px;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: monospace;
+      font-size: 0.85rem;
+      text-align: center;
+      min-width: 320px;
+    }
+
+    .history-table th {
+      background: rgba(255,255,255,0.03);
+      color: var(--text-dim);
+      padding: 10px;
+      font-weight: normal;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .history-table td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.02);
+    }
+
+    .history-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .day-col {
+      color: var(--primary-color);
+      font-weight: bold;
     }
 
     /* Buttons styling */
@@ -220,7 +282,6 @@
       cursor: pointer;
       border-radius: 14px;
       width: 100%;
-      transition: opacity 0.2s;
     }
 
     .btn-main:hover { opacity: 0.9; }
@@ -229,19 +290,17 @@
       background: none;
       border: none;
       color: var(--text-color);
-      font-size: 1.5rem;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Records inside history view */
-    .record-item {
-      background: var(--surface-card);
-      border: 1px solid var(--border-color);
-      padding: 12px 16px;
-      border-radius: 12px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
+    /* Minimalist gear vector icon from file 431.jpg */
+    .gear-icon {
+      width: 24px;
+      height: 24px;
+      fill: var(--text-color);
     }
   </style>
 </head>
@@ -249,40 +308,51 @@
 
   <div class="phone-container">
 
+    <!-- OVERLAY MENU (Settings & Navigation) -->
     <div id="settings-overlay" class="overlay-menu">
       <div class="overlay-header">
-        <span class="app-title">settings</span>
-        <button id="btn-close-menu" class="btn-close">&times;</button>
+        <span class="app-title">Settings</span>
+        <!-- Gear Close Icon from 431.jpg -->
+        <button id="btn-close-menu" class="btn-close">
+          <svg class="gear-icon" viewBox="0 0 24 24">
+            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+          </svg>
+        </button>
       </div>
       <div class="menu-list">
-        <button class="menu-item" id="menu-current"><span>&bull; current month</span> <span>&rarr;</span></button>
-        <button class="menu-item" id="menu-history"><span>&bull; history archive</span> <span>&rarr;</span></button>
-        <button class="menu-item" id="menu-theme"><span>&bull; theme (dark)</span></button>
+        <button class="menu-item" id="menu-current"><span>&bull; current workspace</span> <span>&rarr;</span></button>
+        <button class="menu-item" id="menu-history"><span>&bull; archive ledger (ဇယား)</span> <span>&rarr;</span></button>
         <button class="menu-item" id="menu-logout" style="color: var(--error-color);"><span>&bull; log out</span></button>
       </div>
     </div>
 
+    <!-- 1. AUTH SCREEN -->
     <div id="auth-screen" class="screen active">
       <div class="auth-screen">
-        <div class="app-title" style="font-size: 2rem; margin-bottom: 12px;">di-wallet</div>
-        <p style="color: var(--text-dim); margin-bottom: 40px;">minimalist financial logs.</p>
+        <div class="app-title" style="font-size: 2.2rem; margin-bottom: 12px;">Di-Wallet</div>
+        <p style="color: var(--text-dim); margin-bottom: 40px; font-size: 0.9rem;">minimalist financial logs.</p>
         <button id="btn-login" class="btn-main">sign in with google</button>
       </div>
     </div>
 
+    <!-- 2. WORKSPACE SCREEN -->
     <div id="app-screen" class="screen">
       
+      <!-- Top Bar Component -->
       <div class="header">
-        <span class="app-title" id="app-view-title">di-wallet</span>
-        <button id="btn-trigger-settings" class="settings-trigger">⚙️</button>
+        <span class="app-title" id="app-view-title">Di-Wallet</span>
+        <button id="btn-trigger-settings" class="profile-widget-trigger">
+          <img id="user-avatar" class="profile-avatar" src="https://via.placeholder.com/150" alt="avatar">
+          <span id="user-display-name" class="profile-name">loading...</span>
+        </button>
       </div>
 
+      <!-- VIEW A: MAIN GRID WORKSPACE -->
       <div id="main-view">
-        
         <div class="status-widget">
           <div class="widget-row">
             <span class="widget-label">balance</span>
-            <span class="widget-value" id="dash-balance" style="color: var(--secondary-color);">0</span>
+            <span class="widget-value" id="dash-balance" style="color: var(--secondary-color); font-size: 1.2rem;">0</span>
           </div>
           <div class="widget-row">
             <span class="widget-label">date</span>
@@ -295,28 +365,42 @@
           <button id="btn-save-budget" class="btn-main" style="width: auto; padding: 0 20px;">save</button>
         </div>
 
+        <!-- Inputs Forms with Live Under-text Indicators -->
         <div class="meal-grid">
           <div class="grid-row">
             <span class="grid-label">breakfast</span>
-            <input type="number" id="amount-breakfast" class="input-field" placeholder="0" data-desc="breakfast">
+            <div>
+              <input type="number" id="amount-breakfast" class="input-field" placeholder="0">
+              <div class="live-badge">today: <span id="live-breakfast">0</span></div>
+            </div>
           </div>
           <div class="grid-row">
             <span class="grid-label">lunch</span>
-            <input type="number" id="amount-lunch" class="input-field" placeholder="0" data-desc="lunch">
+            <div>
+              <input type="number" id="amount-lunch" class="input-field" placeholder="0">
+              <div class="live-badge">today: <span id="live-lunch">0</span></div>
+            </div>
           </div>
           <div class="grid-row">
             <span class="grid-label">dinner</span>
-            <input type="number" id="amount-dinner" class="input-field" placeholder="0" data-desc="dinner">
+            <div>
+              <input type="number" id="amount-dinner" class="input-field" placeholder="0">
+              <div class="live-badge">today: <span id="live-dinner">0</span></div>
+            </div>
           </div>
           <div class="grid-row">
             <span class="grid-label">other</span>
-            <input type="number" id="amount-other" class="input-field" placeholder="0" data-desc="other">
+            <div>
+              <input type="number" id="amount-other" class="input-field" placeholder="0">
+              <div class="live-badge">today: <span id="live-other">0</span></div>
+            </div>
           </div>
         </div>
 
         <button id="btn-save-grid" class="btn-main">save transactions</button>
       </div>
 
+      <!-- VIEW B: ARCHIVE TABLE VIEW -->
       <div id="history-view" class="screen">
         <div style="display: flex; gap: 8px; margin-bottom: 16px;">
           <select id="history-year" class="input-field" style="flex: 1;">
@@ -327,36 +411,48 @@
           <button id="btn-search-history" class="btn-main" style="width: auto; padding: 0 16px;">fetch</button>
         </div>
 
-        <div class="status-widget" style="background: rgba(255,255,255,0.02)">
+        <div class="status-widget" style="background: rgba(255,255,255,0.01)">
           <div class="widget-row">
             <span class="widget-label">archive income</span>
             <span id="hist-dash-budget">0</span>
           </div>
           <div class="widget-row">
-            <span class="widget-label">archive total expense</span>
+            <span class="widget-label">total expense</span>
             <span id="hist-dash-expense" style="color: var(--error-color);">0</span>
           </div>
         </div>
 
-        <div id="history-records-container" style="margin-top: 16px; max-height: 250px; overflow-y: auto;">
-          </div>
+        <!-- Matrix Structured Grid Table -->
+        <div class="table-container">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>date</th>
+                <th>breakfast</th>
+                <th>lunch</th>
+                <th>dinner</th>
+                <th>other</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <!-- Dynamic rows will inject here -->
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
   </div>
 
   <script>
-    // ----------------------------------------------------
-    // INJECTED FIREBASE CONFIGURATION (di-wallet-v1)
-    // ----------------------------------------------------
+    // AUTOMATICALLY FIXED CONFIGURATION WITH YOUR CORRECT PROJECT CREDENTIALS
     const firebaseConfig = {
       apiKey: "AIzaSyB7MTBBQLivq0vfixtXa8CLEIROUeebXGw",
-      authDomain: "di-wallet-v1.firebaseapp.com",
-      projectId: "di-wallet-v1",
-      storageBucket: "di-wallet-v1.firebasestorage.app",
+      authDomain: "xxxtension678-rgb.firebaseapp.com",
+      projectId: "xxxtension678-rgb",
+      storageBucket: "xxxtension678-rgb.firebasestorage.app",
       messagingSenderId: "393481838636",
-      appId: "1:393481838636:web:60c0ec092c7fea0c823189",
-      measurementId: "G-EYGRQCDKQG"
+      appId: "1:393481838636:web:60c0ec092c7fea0c823189"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -368,10 +464,10 @@
     let today = new Date();
     let currentYear = today.getFullYear();
     let currentMonth = today.getMonth() + 1;
+    let globalActiveExpenses = [];
     
     const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 
-    // Element States Mapping
     const settingsOverlay = document.getElementById('settings-overlay');
     const authScreen = document.getElementById('auth-screen');
     const appScreen = document.getElementById('app-screen');
@@ -379,7 +475,6 @@
     const historyView = document.getElementById('history-view');
     const appViewTitle = document.getElementById('app-view-title');
 
-    // UI Trigger Functions
     document.getElementById('btn-trigger-settings').addEventListener('click', () => settingsOverlay.classList.add('open'));
     document.getElementById('btn-close-menu').addEventListener('click', () => settingsOverlay.classList.remove('open'));
 
@@ -387,14 +482,14 @@
       settingsOverlay.classList.remove('open');
       historyView.classList.remove('active');
       mainView.style.display = 'block';
-      appViewTitle.textContent = "di-wallet";
+      appViewTitle.textContent = "Di-Wallet";
     });
 
     document.getElementById('menu-history').addEventListener('click', () => {
       settingsOverlay.classList.remove('open');
       mainView.style.display = 'none';
       historyView.classList.add('active');
-      appViewTitle.textContent = "archive";
+      appViewTitle.textContent = "Archive";
     });
 
     document.getElementById('menu-logout').addEventListener('click', () => {
@@ -402,11 +497,9 @@
       auth.signOut();
     });
 
-    // Run-time Engine
     function init() {
       document.getElementById('dash-date').textContent = `${today.getDate()}/${currentMonth}/${currentYear}`;
       
-      // Setup Month Options
       const monthSelect = document.getElementById('history-month');
       monthNames.forEach((name, i) => {
         const opt = document.createElement('option');
@@ -419,6 +512,9 @@
       auth.onAuthStateChanged(user => {
         if (user) {
           currentUser = user;
+          document.getElementById('user-avatar').src = user.photoURL || 'https://via.placeholder.com/150';
+          document.getElementById('user-display-name').textContent = (user.displayName || 'user').toLowerCase();
+          
           authScreen.classList.remove('active');
           appScreen.classList.add('active');
           syncCurrentMonthData();
@@ -438,26 +534,39 @@
                .collection('months').doc(String(month).padStart(2, '0'));
     }
 
+    function renderTodayLiveCounters() {
+      const currentDay = today.getDate();
+      const categories = ['breakfast', 'lunch', 'dinner', 'other'];
+      
+      categories.forEach(cat => {
+        const sumForCat = globalActiveExpenses
+          .filter(item => item.day === currentDay && item.desc === cat)
+          .reduce((sum, item) => sum + item.amount, 0);
+        document.getElementById(`live-${cat}`).textContent = sumForCat;
+      });
+    }
+
     function syncCurrentMonthData() {
       if (!currentUser) return;
       getMonthDocRef(currentYear, currentMonth).onSnapshot(doc => {
         let budget = 0;
-        let expenses = [];
+        globalActiveExpenses = [];
         if (doc.exists) {
           budget = doc.data().budget || 0;
-          expenses = doc.data().expenses || [];
+          globalActiveExpenses = doc.data().expenses || [];
         }
         document.getElementById('input-budget').value = budget;
-        
-        let totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
+        let totalExpense = globalActiveExpenses.reduce((sum, item) => sum + item.amount, 0);
         document.getElementById('dash-balance').textContent = budget - totalExpense;
+        
+        renderTodayLiveCounters();
       });
     }
 
     document.getElementById('btn-save-budget').addEventListener('click', () => {
       const budgetVal = parseFloat(document.getElementById('input-budget').value) || 0;
       getMonthDocRef(currentYear, currentMonth).set({ budget: budgetVal }, { merge: true })
-        .then(() => alert('income updated.'));
+        .then(() => alert('income budget synchronized.'));
     });
 
     document.getElementById('btn-save-grid').addEventListener('click', () => {
@@ -481,41 +590,58 @@
         }
       });
 
-      if (batchTransactions.length === 0) return alert('please fill at least one row.');
+      if (batchTransactions.length === 0) return alert('please enter data value.');
 
       getMonthDocRef(currentYear, currentMonth).set({
         expenses: firebase.firestore.FieldValue.arrayUnion(...batchTransactions)
       }, { merge: true }).then(() => {
         inputs.forEach(id => document.getElementById(`amount-${id}`).value = '');
-        alert('statements logged safely.');
+        alert('data added.');
       });
     });
 
-    // History Fetcher
     document.getElementById('btn-search-history').addEventListener('click', () => {
       const y = document.getElementById('history-year').value;
       const m = String(document.getElementById('history-month').value).padStart(2, '0');
-      const container = document.getElementById('history-records-container');
+      const tableBody = document.getElementById('history-table-body');
 
       db.collection('users').doc(currentUser.uid)
         .collection('years').doc(y)
         .collection('months').doc(m).get().then(doc => {
-          container.innerHTML = '';
+          tableBody.innerHTML = '';
           let budget = 0, expenses = [];
           if (doc.exists) {
             budget = doc.data().budget || 0;
             expenses = doc.data().expenses || [];
           }
           document.getElementById('hist-dash-budget').textContent = budget;
-          let total = expenses.reduce((sum, item) => sum + item.amount, 0);
-          document.getElementById('hist-dash-expense').textContent = total;
+          document.getElementById('hist-dash-expense').textContent = expenses.reduce((sum, item) => sum + item.amount, 0);
 
-          expenses.sort((a,b) => a.day - b.day).forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'record-item';
-            div.innerHTML = `<span>day ${item.day}: ${item.desc}</span><span>${item.amount}</span>`;
-            container.appendChild(div);
+          let daysMatrix = {};
+          expenses.forEach(item => {
+            if (!daysMatrix[item.day]) {
+              daysMatrix[item.day] = { breakfast: 0, lunch: 0, dinner: 0, other: 0 };
+            }
+            if (daysMatrix[item.day].hasOwnProperty(item.desc)) {
+              daysMatrix[item.day][item.desc] += item.amount;
+            }
           });
+
+          Object.keys(daysMatrix).sort((a, b) => a - b).forEach(day => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td class="day-col">day ${day}</td>
+              <td>${daysMatrix[day].breakfast || '-'}</td>
+              <td>${daysMatrix[day].lunch || '-'}</td>
+              <td>${daysMatrix[day].dinner || '-'}</td>
+              <td>${daysMatrix[day].other || '-'}</td>
+            `;
+            tableBody.appendChild(tr);
+          });
+
+          if(Object.keys(daysMatrix).length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" style="color: var(--text-dim); padding: 20px;">no records found</td></tr>`;
+          }
         });
     });
 
