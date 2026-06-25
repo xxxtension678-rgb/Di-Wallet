@@ -3,118 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>di-wallet</title>
+    <title>di-wallet // glassmorphism dark</title>
     <style>
+        /* Glassmorphism Dark Mode Styling (Inspired by 412.jpg & 413.jpg) */
         :root {
-            --bg: #090d16;
-            --card: #111827;
-            --border: #1f2937;
-            --text: #f3f4f6;
-            --muted: #9ca3af;
-            --primary: #38bdf8;
-            --accent-bf: #f59e0b;
-            --accent-lh: #10b981;
-            --accent-dn: #ef4444;
-            --accent-ot: #8b5cf6;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass-bg: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            
+            /* Clean category indicator accents */
+            --color-bf: #38bdf8;
+            --color-lh: #34d399;
+            --color-dn: #f87171;
+            --color-ot: #c084fc;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: monospace;
-            font-size: 11px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            letter-spacing: -0.3px;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 10px;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px 15px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
         }
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 420px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 16px;
         }
 
+        /* Glassmorphic Panel Base */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header Style */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
         }
 
         .logo {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            color: var(--primary);
+            color: var(--text-main);
             text-transform: lowercase;
+            position: relative;
+        }
+        .logo::after {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--color-bf);
+            border-radius: 50%;
+            margin-left: 4px;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .auth-btn {
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
+        /* Smooth Glass Buttons */
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 20px;
             cursor: pointer;
-            font-weight: bold;
             text-transform: lowercase;
+            transition: all 0.2s ease;
+        }
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--glass-highlight);
         }
 
         .user-info {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            color: var(--accent-lh);
-        }
-
-        .settings-btn {
-            background: none;
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 4px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 2px;
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            color: var(--muted);
-            padding: 6px;
-            cursor: pointer;
-            border-radius: 4px;
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: #34d399;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
             text-transform: lowercase;
         }
 
+        /* Tabs Section (Inspired by 414.jpg) */
+        .tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: lowercase;
+            transition: all 0.2s ease;
+        }
+
         .tab-btn.active {
-            background: var(--border);
-            color: var(--primary);
-            font-weight: bold;
+            background: var(--glass-highlight);
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .view-panel {
@@ -124,65 +150,76 @@
         .view-panel.active {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 16px;
         }
 
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
-        }
-
+        /* Form Controls */
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            margin-bottom: 8px;
+            gap: 6px;
+            margin-bottom: 14px;
         }
 
         label {
-            color: var(--muted);
+            color: var(--text-muted);
             text-transform: lowercase;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
         }
 
         select, input {
-            background: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-            padding: 6px;
-            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px;
             outline: none;
             width: 100%;
+            transition: border-color 0.2s;
+        }
+        select:focus, input:focus {
+            border-color: var(--glass-highlight);
         }
 
         .grid-inputs {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 12px;
         }
 
-        .input-bf { border-left: 3px solid var(--accent-bf); }
-        .input-lh { border-left: 3px solid var(--accent-lh); }
-        .input-dn { border-left: 3px solid var(--accent-dn); }
-        .input-ot { border-left: 3px solid var(--accent-ot); }
-
-        .btn-main {
-            background: var(--primary);
-            color: var(--bg);
+        .btn-submit {
+            background: var(--text-main);
+            color: #0f172a;
             border: none;
-            padding: 8px;
-            border-radius: 4px;
+            border-radius: 12px;
+            padding: 12px;
             width: 100%;
             cursor: pointer;
             font-weight: bold;
             text-transform: lowercase;
+            transition: opacity 0.2s;
             margin-top: 4px;
         }
+        .btn-submit:block {
+            opacity: 0.9;
+        }
 
+        /* Table & Lists View */
         .table-wrapper {
             overflow-x: hidden;
-            margin-top: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.15);
         }
 
         table {
@@ -192,42 +229,41 @@
         }
 
         th, td {
-            padding: 4px 2px;
-            border-bottom: 1px solid var(--border);
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--glass-border);
+            text-transform: lowercase;
         }
 
         th {
-            color: var(--muted);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
             font-weight: normal;
         }
 
-        .col-date { width: 14%; }
-        .col-amt { width: 16%; text-align: right; }
-        .col-tot { width: 20%; text-align: right; font-weight: bold; }
-
-        .txt-bf { color: var(--accent-bf); }
-        .txt-lh { color: var(--accent-lh); }
-        .txt-dn { color: var(--accent-dn); }
-        .txt-ot { color: var(--accent-ot); }
+        .col-date { width: 15%; text-align: center; color: var(--text-muted); }
+        .col-amt { width: 17%; text-align: right; }
+        .col-tot { width: 19%; text-align: right; font-weight: bold; }
 
         .total-box {
             display: flex;
             justify-content: space-between;
-            background: var(--bg);
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-            margin-top: 6px;
-            font-weight: bold;
-        }
-
-        .status-bar {
-            font-size: 10px;
-            color: var(--muted);
-            text-align: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
             text-transform: lowercase;
         }
 
+        .status-bar {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            text-transform: lowercase;
+            padding: 4px;
+        }
+
+        /* Overlay Modal */
         .modal {
             display: none;
             position: fixed;
@@ -235,10 +271,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
-            padding: 10px;
+            padding: 15px;
             z-index: 100;
         }
 
@@ -247,169 +284,258 @@
         }
 
         .modal-content {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
             width: 100%;
-            max-width: 440px;
-            padding: 12px;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 14px;
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 4px;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--accent-dn);
-            cursor: pointer;
-            font-size: 14px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <header>
+        <!-- Header Section -->
+        <header class="glass-panel">
             <div class="logo">di-wallet</div>
             <div class="header-actions">
                 <div id="auth-status">
-                    <button class="auth-btn" id="login-btn" onclick="handleAuthClick()" style="display:none;">login</button>
+                    <button class="btn-glass" onclick="initiateGoogleLogin()">connect account</button>
                 </div>
-                <button class="settings-btn" onclick="toggleModal(true)">⚙️</button>
+                <button class="btn-glass" style="padding: 6px 8px;" onclick="toggleModal(true)">⚙️</button>
             </div>
         </header>
 
+        <!-- Segmented Tabs -->
         <div class="tabs">
             <button id="tab-input" class="tab-btn active" onclick="switchTab('input')">input</button>
-            <button id="tab-month" class="tab-btn" onclick="switchTab('month')">this month</button>
+            <button id="tab-month" class="tab-btn" onclick="switchTab('month')">history</button>
         </div>
 
+        <!-- Input Panel -->
         <div id="panel-input" class="view-panel active">
-            <div class="card">
+            <div class="glass-panel">
                 <div class="form-group">
-                    <label>day (ရက်စွဲ)</label>
+                    <label>select date</label>
                     <select id="inp-day"></select>
                 </div>
                 <div class="grid-inputs">
                     <div class="form-group">
-                        <label class="txt-bf">breakfast</label>
-                        <input type="number" id="inp-bf" class="input-bf" placeholder="0">
+                        <label><span class="dot" style="background: var(--color-bf);"></span>breakfast</label>
+                        <input type="number" id="inp-bf" placeholder="0">
                     </div>
                     <div class="form-group">
-                        <label class="txt-lh">lunch</label>
-                        <input type="number" id="inp-lh" class="input-lh" placeholder="0">
+                        <label><span class="dot" style="background: var(--color-lh);"></span>lunch</label>
+                        <input type="number" id="inp-lh" placeholder="0">
                     </div>
                     <div class="form-group">
-                        <label class="txt-dn">dinner</label>
-                        <input type="number" id="inp-dn" class="input-dn" placeholder="0">
+                        <label><span class="dot" style="background: var(--color-dn);"></span>dinner</label>
+                        <input type="number" id="inp-dn" placeholder="0">
                     </div>
                     <div class="form-group">
-                        <label class="txt-ot">other</label>
-                        <input type="number" id="inp-ot" class="input-ot" placeholder="0">
+                        <label><span class="dot" style="background: var(--color-ot);"></span>other</label>
+                        <input type="number" id="inp-ot" placeholder="0">
                     </div>
                 </div>
-                <button class="btn-main" onclick="saveTodayEntry()">save entry</button>
+                <button class="btn-submit" onclick="saveTodayEntry()">save entry log</button>
             </div>
-            <div id="sync-info" class="status-bar">initializing google API...</div>
+            <div id="sync-info" class="status-bar">system stream online...</div>
         </div>
 
+        <!-- History Panel -->
         <div id="panel-month" class="view-panel">
-            <div class="card">
-                <span id="month-title" style="font-weight: bold; color: var(--primary);"></span>
+            <div class="glass-panel">
+                <div id="month-title" style="text-transform: lowercase; margin-bottom: 10px; color: var(--text-muted);"></div>
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
-                                <th class="col-date">date</th>
-                                <th class="col-amt txt-bf">bf</th>
-                                <th class="col-amt txt-lh">lh</th>
-                                <th class="col-amt txt-dn">dn</th>
-                                <th class="col-amt txt-ot">ot</th>
-                                <th class="col-tot">total</th>
+                                <th class="col-date">day</th>
+                                <th class="col-amt">bf</th>
+                                <th class="col-amt">lh</th>
+                                <th class="col-amt">dn</th>
+                                <th class="col-amt">ot</th>
+                                <th class="col-tot">tot</th>
                             </tr>
                         </thead>
                         <tbody id="month-table-body"></tbody>
                     </table>
                 </div>
                 <div class="total-box">
-                    <span>total:</span>
-                    <span id="month-total-amt" style="color: var(--primary);">0</span>
+                    <span>grand total:</span>
+                    <span id="month-total-amt" style="font-weight: bold; color: var(--color-bf);">0</span>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Filter Modal -->
     <div id="settings-modal" class="modal">
-        <div class="modal-content">
+        <div class="glass-panel modal-content">
             <div class="modal-header">
-                <span style="font-weight: bold; color: var(--primary);">settings / history archive</span>
-                <button class="close-btn" onclick="toggleModal(false)">✕</button>
+                <span style="text-transform: lowercase; color: var(--text-muted);">archive filters</span>
+                <span style="cursor: pointer; color: var(--text-muted);" onclick="toggleModal(false)">✕</span>
             </div>
             
-            <div class="card" style="padding: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <div class="form-group" style="margin:0;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
                     <label>year</label>
                     <select id="hist-year" onchange="renderHistory()"></select>
                 </div>
-                <div class="form-group" style="margin:0;">
+                <div class="form-group">
                     <label>month</label>
                     <select id="hist-month" onchange="renderHistory()"></select>
                 </div>
             </div>
 
-            <div class="card" style="flex: 1; max-height: 280px; overflow-y: auto; padding: 8px;">
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="col-date">date</th>
-                                <th class="col-amt txt-bf">bf</th>
-                                <th class="col-amt txt-lh">lh</th>
-                                <th class="col-amt txt-dn">dn</th>
-                                <th class="col-amt txt-ot">ot</th>
-                                <th class="col-tot">total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="hist-table-body"></tbody>
-                    </table>
-                </div>
-                <div class="total-box">
-                    <span>selected month total:</span>
-                    <span id="hist-total-amt" style="color: var(--primary);">0</span>
-                </div>
+            <div class="table-wrapper" style="max-height: 200px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-date">day</th>
+                            <th class="col-amt">bf</th>
+                            <th class="col-amt">lh</th>
+                            <th class="col-amt">dn</th>
+                            <th class="col-amt">ot</th>
+                            <th class="col-tot">tot</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hist-table-body"></tbody>
+                </table>
+            </div>
+            <div class="total-box">
+                <span>filter total:</span>
+                <span id="hist-total-amt" style="font-weight: bold; color: var(--color-lh);">0</span>
             </div>
         </div>
     </div>
 
-    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-
+    <!-- Core App Logic & Secure Cloud Handler -->
     <script>
         const CLIENT_ID = '987816810795-h2b2hgj09mvio7q0allbbbvbl3pr2eft.apps.googleusercontent.com'; 
-        const API_KEY = 'AIzaSyAVtF5zU018e045X55beE7T_npSA3gozrs';
-        const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
         const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
         
         let expenseData = JSON.parse(localStorage.getItem('di_wallet_data')) || {};
-        let tokenClient;
-        let gapiInited = false;
-        let gisInited = false;
         let backupFileId = null;
+        let accessToken = localStorage.getItem('google_access_token') || null;
 
         window.onload = function() {
             initSelectors();
             setupDayDropdown();
             renderCurrentMonthTable();
+            checkUrlForToken();
+            
+            if (accessToken) {
+                document.getElementById('auth-status').innerHTML = '<div class="user-info">connected</div>';
+                updateSyncStatus("streaming cloud index...");
+                syncWithCloud();
+            }
         };
+
+        function initiateGoogleLogin() {
+            const redirectUri = window.location.href.split('#')[0].split('?')[0];
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+                            `client_id=${encodeURIComponent(CLIENT_ID)}&` +
+                            `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+                            `response_type=token&` +
+                            `scope=${encodeURIComponent(SCOPES)}&` +
+                            `include_granted_scopes=true&` +
+                            `prompt=consent`;
+            window.location.href = authUrl;
+        }
+
+        function checkUrlForToken() {
+            const hash = window.location.hash;
+            if (hash && hash.includes('access_token')) {
+                const params = new URLSearchParams(hash.substring(1));
+                accessToken = params.get('access_token');
+                localStorage.setItem('google_access_token', accessToken);
+                window.history.replaceState({}, document.title, window.location.pathname);
+                document.getElementById('auth-status').innerHTML = '<div class="user-info">connected</div>';
+                syncWithCloud();
+            }
+        }
+
+        async function syncWithCloud() {
+            if (!accessToken) return;
+            updateSyncStatus("validating application folder pointer...");
+            try {
+                let listRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("name='di_wallet_backup.json' and spaces='appDataFolder'")}&spaces=appDataFolder`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                let listData = await listRes.json();
+                
+                if (listData.files && listData.files.length > 0) {
+                    backupFileId = listData.files[0].id;
+                    updateSyncStatus("merging sync stream packet...");
+                    
+                    let fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${backupFileId}?alt=media`, {
+                        headers: { 'Authorization': `Bearer ${accessToken}` }
+                    });
+                    let cloudData = await fileRes.json();
+                    if (cloudData) {
+                        expenseData = Object.assign(cloudData, expenseData);
+                        localStorage.setItem('di_wallet_data', JSON.stringify(expenseData));
+                        renderCurrentMonthTable();
+                    }
+                }
+                await uploadToCloud();
+            } catch (err) {
+                console.error(err);
+                updateSyncStatus("handshake lost. re-auth required.");
+                localStorage.removeItem('google_access_token');
+            }
+        }
+
+        async function uploadToCloud() {
+            if (!accessToken) return;
+            updateSyncStatus("pushing layout array data...");
+            try {
+                if (backupFileId) {
+                    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${backupFileId}?uploadType=media`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(expenseData)
+                    });
+                } else {
+                    let metadata = { name: 'di_wallet_backup.json', parents: ['appDataFolder'] };
+                    let createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(metadata)
+                    });
+                    let createData = await createRes.json();
+                    backupFileId = createData.id;
+                    
+                    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${backupFileId}?uploadType=media`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(expenseData)
+                    });
+                }
+                updateSyncStatus("cloud state: optimal & secured");
+            } catch (e) {
+                console.error(e);
+                updateSyncStatus("cloud sync update failed.");
+            }
+        }
 
         function initSelectors() {
             const currentYear = new Date().getFullYear();
@@ -433,7 +559,7 @@
             const daySelect = document.getElementById('inp-day');
             daySelect.innerHTML = '';
             for (let d = 1; d <= totalDays; d++) {
-                daySelect.add(new Option(`day ${d}`, d));
+                daySelect.add(new Option(`day ${String(d).padStart(2, '0')}`, d));
             }
             daySelect.value = now.getDate();
         }
@@ -469,7 +595,6 @@
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(document.getElementById('inp-day').value).padStart(2, '0');
-            
             const key = `${year}-${month}-${day}`;
             
             const bf = parseFloat(document.getElementById('inp-bf').value) || 0;
@@ -485,8 +610,8 @@
             document.getElementById('inp-dn').value = '';
             document.getElementById('inp-ot').value = '';
 
-            updateSyncStatus("saved locally!");
-            if (gapi.client.getToken()) {
+            updateSyncStatus("local packet mapped successfully.");
+            if (accessToken) {
                 uploadToCloud();
             }
         }
@@ -495,7 +620,7 @@
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
-            document.getElementById('month-title').innerText = `current month: ${year}-${month}`;
+            document.getElementById('month-title').innerText = `active index: ${year}-${month}`;
             buildTable(year, month, 'month-table-body', 'month-total-amt');
         }
 
@@ -521,10 +646,10 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td class="col-date">${dayStr}</td>
-                        <td class="col-amt txt-bf">${r.bf || '-'}</td>
-                        <td class="col-amt txt-lh">${r.lh || '-'}</td>
-                        <td class="col-amt txt-dn">${r.dn || '-'}</td>
-                        <td class="col-amt txt-ot">${r.ot || '-'}</td>
+                        <td class="col-amt">${r.bf || '-'}</td>
+                        <td class="col-amt">${r.lh || '-'}</td>
+                        <td class="col-amt">${r.dn || '-'}</td>
+                        <td class="col-amt">${r.ot || '-'}</td>
                         <td class="col-tot">${r.tot}</td>
                     `;
                     tbody.appendChild(tr);
@@ -534,128 +659,7 @@
         }
 
         function updateSyncStatus(msg) {
-            document.getElementById('sync-info').innerText = msg;
-        }
-
-        /* --- ☁️ Correct Official Google Drive API Client Logic --- */
-        function gapiLoaded() {
-            gapi.load('client', initializeGapiClient);
-        }
-
-        async function initializeGapiClient() {
-            await gapi.client.init({
-                apiKey: API_KEY,
-                discoveryDocs: [DISCOVERY_DOC],
-            });
-            gapiInited = true;
-            maybeEnableButtons();
-        }
-
-        function gisLoaded() {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                ux_mode: 'popup',
-                callback: '', // defined dynamically during invocation
-            });
-            gisInited = true;
-            maybeEnableButtons();
-        }
-
-        function maybeEnableButtons() {
-            if (gapiInited && gisInited) {
-                document.getElementById('login-btn').style.display = 'block';
-                updateSyncStatus("local storage mode (ready to sync)");
-            }
-        }
-
-        function handleAuthClick() {
-            tokenClient.callback = async (resp) => {
-                if (resp.error !== undefined) {
-                    throw (resp);
-                }
-                document.getElementById('auth-status').innerHTML = '<div class="user-info">☁️ cloud synced</div>';
-                await syncWithCloud();
-            };
-
-            if (gapi.client.getToken() === null) {
-                tokenClient.requestAccessToken({prompt: 'consent'});
-            } else {
-                tokenClient.requestAccessToken({prompt: ''});
-            }
-        }
-
-        async function syncWithCloud() {
-            updateSyncStatus("searching cloud backup...");
-            try {
-                let response = await gapi.client.drive.files.list({
-                    q: "name='di_wallet_backup.json' and spaces='appDataFolder'",
-                    spaces: 'appDataFolder',
-                    fields: 'files(id, name)'
-                });
-                
-                let files = response.result.files;
-                if (files && files.length > 0) {
-                    backupFileId = files[0].id;
-                    updateSyncStatus("downloading cloud data...");
-                    
-                    let fileRes = await gapi.client.drive.files.get({
-                        fileId: backupFileId,
-                        alt: 'media'
-                    });
-                    
-                    let cloudData = fileRes.result;
-                    if (cloudData) {
-                        expenseData = Object.assign(cloudData, expenseData);
-                        localStorage.setItem('di_wallet_data', JSON.stringify(expenseData));
-                        renderCurrentMonthTable();
-                    }
-                }
-                await uploadToCloud();
-            } catch (err) {
-                console.error(err);
-                updateSyncStatus("cloud sync failed.");
-            }
-        }
-
-        async function uploadToCloud() {
-            updateSyncStatus("uploading backup...");
-            try {
-                if (backupFileId) {
-                    // Update existing backup
-                    await gapi.client.request({
-                        path: '/upload/drive/v3/files/' + backupFileId,
-                        method: 'PATCH',
-                        params: { uploadType: 'media' },
-                        body: JSON.stringify(expenseData)
-                    });
-                } else {
-                    // Create new file metadata inside appDataFolder
-                    let metadata = {
-                        name: 'di_wallet_backup.json',
-                        parents: ['appDataFolder']
-                    };
-                    
-                    let response = await gapi.client.drive.files.create({
-                        resource: metadata,
-                        fields: 'id'
-                    });
-                    
-                    backupFileId = response.result.id;
-                    
-                    // Upload the payload media
-                    await gapi.client.request({
-                        path: '/upload/drive/v3/files/' + backupFileId,
-                        method: 'PATCH',
-                        params: { uploadType: 'media' },
-                        body: JSON.stringify(expenseData)
-                    });
-                }
-                updateSyncStatus("cloud storage active (all backup synced)");
-            } catch (e) {
-                console.error(e);
-                updateSyncStatus("backup update failed.");
-            }
+            document.getElementById('sync-info').innerText = `>> system: ${msg}`;
         }
     </script>
 </body>
