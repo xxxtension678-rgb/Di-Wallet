@@ -1,666 +1,668 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>di-wallet // glassmorphism dark</title>
-    <style>
-        /* Glassmorphism Dark Mode Styling (Inspired by 412.jpg & 413.jpg) */
-        :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            --glass-bg: rgba(30, 41, 59, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-highlight: rgba(255, 255, 255, 0.15);
-            
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            
-            /* Clean category indicator accents */
-            --color-bf: #38bdf8;
-            --color-lh: #34d399;
-            --color-dn: #f87171;
-            --color-ot: #c084fc;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Di-Wallet</title>
+  
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            letter-spacing: -0.3px;
-        }
+  <style>
+    :root {
+      --bg-color: #121212;
+      --surface-color: #1e1e1e;
+      --primary-color: #bb86fc;
+      --secondary-color: #03dac6;
+      --text-color: #e0e0e0;
+      --text-dim: #a0a0a0;
+      --border-color: #333333;
+      --error-color: #cf6679;
+    }
 
-        body {
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 20px 15px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 420px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: monospace;
+      text-transform: lowercase;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
 
-        /* Glassmorphic Panel Base */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
 
-        /* Header Style */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .app-title {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      text-transform: none; /* Keep exact casing for Di-Wallet */
+    }
 
-        .logo {
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--text-main);
-            text-transform: lowercase;
-            position: relative;
-        }
-        .logo::after {
-            content: '';
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: var(--color-bf);
-            border-radius: 50%;
-            margin-left: 4px;
-        }
+    .screen {
+      display: none;
+    }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .screen.active {
+      display: block;
+    }
 
-        /* Smooth Glass Buttons */
-        .btn-glass {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            text-transform: lowercase;
-            transition: all 0.2s ease;
-        }
-        .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--glass-highlight);
-        }
+    /* Auth Screen */
+    .auth-container {
+      text-align: center;
+      padding: 40px 0;
+    }
 
-        .user-info {
-            background: rgba(52, 211, 153, 0.15);
-            border: 1px solid rgba(52, 211, 153, 0.3);
-            color: #34d399;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            text-transform: lowercase;
-        }
+    /* Comic / Flat Styled Buttons */
+    button {
+      background-color: var(--surface-color);
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+      padding: 10px 20px;
+      font-family: monospace;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      text-transform: lowercase;
+    }
 
-        /* Tabs Section (Inspired by 414.jpg) */
-        .tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 4px;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-        }
+    button:hover {
+      background-color: var(--primary-color);
+      color: var(--bg-color);
+      box-shadow: 2px 2px 0px var(--secondary-color);
+    }
 
-        .tab-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: lowercase;
-            transition: all 0.2s ease;
-        }
+    button:disabled {
+      border-color: var(--border-color);
+      color: var(--text-dim);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
 
-        .tab-btn.active {
-            background: var(--glass-highlight);
-            color: var(--text-main);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
+    /* Header info */
+    .user-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--border-color);
+    }
 
-        .view-panel {
-            display: none;
-        }
+    /* Summary Dashboard */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-        .view-panel.active {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      border-radius: 4px;
+    }
 
-        /* Form Controls */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 14px;
-        }
+    .card-title {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 5px;
+    }
 
-        label {
-            color: var(--text-muted);
-            text-transform: lowercase;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+    .card-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
 
-        .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            display: inline-block;
-        }
+    .card-value.balance {
+      color: var(--secondary-color);
+    }
 
-        select, input {
-            background: rgba(0, 0, 0, 0.2);
-            color: var(--text-main);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 10px;
-            outline: none;
-            width: 100%;
-            transition: border-color 0.2s;
-        }
-        select:focus, input:focus {
-            border-color: var(--glass-highlight);
-        }
+    /* Forms */
+    .form-group {
+      margin-bottom: 15px;
+    }
 
-        .grid-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
 
-        .btn-submit {
-            background: var(--text-main);
-            color: #0f172a;
-            border: none;
-            border-radius: 12px;
-            padding: 12px;
-            width: 100%;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: lowercase;
-            transition: opacity 0.2s;
-            margin-top: 4px;
-        }
-        .btn-submit:block {
-            opacity: 0.9;
-        }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      font-family: monospace;
+      border-radius: 4px;
+      outline: none;
+    }
 
-        /* Table & Lists View */
-        .table-wrapper {
-            overflow-x: hidden;
-            border-radius: 10px;
-            border: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.15);
-        }
+    input:focus, select:focus {
+      border-color: var(--primary-color);
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
+    .row {
+      display: flex;
+      gap: 10px;
+    }
 
-        th, td {
-            padding: 10px 8px;
-            border-bottom: 1px solid var(--glass-border);
-            text-transform: lowercase;
-        }
+    .row .form-group {
+      flex: 1;
+    }
 
-        th {
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--text-muted);
-            font-weight: normal;
-        }
+    /* Tables & Lists */
+    .history-section {
+      margin-top: 25px;
+    }
 
-        .col-date { width: 15%; text-align: center; color: var(--text-muted); }
-        .col-amt { width: 17%; text-align: right; }
-        .col-tot { width: 19%; text-align: right; font-weight: bold; }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
 
-        .total-box {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 12px;
-            text-transform: lowercase;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
 
-        .status-bar {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-align: center;
-            text-transform: lowercase;
-            padding: 4px;
-        }
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      text-align: left;
+    }
 
-        /* Overlay Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-            z-index: 100;
-        }
+    th {
+      background: rgba(255,255,255,0.05);
+      color: var(--primary-color);
+    }
 
-        .modal.active {
-            display: flex;
-        }
+    .btn-danger {
+      border-color: var(--error-color);
+      color: var(--error-color);
+      padding: 4px 8px;
+      font-size: 0.8rem;
+    }
+    
+    .btn-danger:hover {
+      background-color: var(--error-color);
+      color: var(--bg-color);
+    }
 
-        .modal-content {
-            width: 100%;
-            max-width: 380px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 10px;
-        }
-    </style>
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Header Section -->
-        <header class="glass-panel">
-            <div class="logo">di-wallet</div>
-            <div class="header-actions">
-                <div id="auth-status">
-                    <button class="btn-glass" onclick="initiateGoogleLogin()">connect account</button>
-                </div>
-                <button class="btn-glass" style="padding: 6px 8px;" onclick="toggleModal(true)">⚙️</button>
-            </div>
-        </header>
+  <div class="container">
+    <div class="app-title">Di-Wallet</div>
 
-        <!-- Segmented Tabs -->
-        <div class="tabs">
-            <button id="tab-input" class="tab-btn active" onclick="switchTab('input')">input</button>
-            <button id="tab-month" class="tab-btn" onclick="switchTab('month')">history</button>
-        </div>
-
-        <!-- Input Panel -->
-        <div id="panel-input" class="view-panel active">
-            <div class="glass-panel">
-                <div class="form-group">
-                    <label>select date</label>
-                    <select id="inp-day"></select>
-                </div>
-                <div class="grid-inputs">
-                    <div class="form-group">
-                        <label><span class="dot" style="background: var(--color-bf);"></span>breakfast</label>
-                        <input type="number" id="inp-bf" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label><span class="dot" style="background: var(--color-lh);"></span>lunch</label>
-                        <input type="number" id="inp-lh" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label><span class="dot" style="background: var(--color-dn);"></span>dinner</label>
-                        <input type="number" id="inp-dn" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label><span class="dot" style="background: var(--color-ot);"></span>other</label>
-                        <input type="number" id="inp-ot" placeholder="0">
-                    </div>
-                </div>
-                <button class="btn-submit" onclick="saveTodayEntry()">save entry log</button>
-            </div>
-            <div id="sync-info" class="status-bar">system stream online...</div>
-        </div>
-
-        <!-- History Panel -->
-        <div id="panel-month" class="view-panel">
-            <div class="glass-panel">
-                <div id="month-title" style="text-transform: lowercase; margin-bottom: 10px; color: var(--text-muted);"></div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="col-date">day</th>
-                                <th class="col-amt">bf</th>
-                                <th class="col-amt">lh</th>
-                                <th class="col-amt">dn</th>
-                                <th class="col-amt">ot</th>
-                                <th class="col-tot">tot</th>
-                            </tr>
-                        </thead>
-                        <tbody id="month-table-body"></tbody>
-                    </table>
-                </div>
-                <div class="total-box">
-                    <span>grand total:</span>
-                    <span id="month-total-amt" style="font-weight: bold; color: var(--color-bf);">0</span>
-                </div>
-            </div>
-        </div>
+    <div id="auth-screen" class="screen active">
+      <div class="auth-container">
+        <p style="margin-bottom: 20px; color: var(--text-dim);">track your daily expenses seamlessly.</p>
+        <button id="btn-login">sign in with google</button>
+      </div>
     </div>
 
-    <!-- Filter Modal -->
-    <div id="settings-modal" class="modal">
-        <div class="glass-panel modal-content">
-            <div class="modal-header">
-                <span style="text-transform: lowercase; color: var(--text-muted);">archive filters</span>
-                <span style="cursor: pointer; color: var(--text-muted);" onclick="toggleModal(false)">✕</span>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="form-group">
-                    <label>year</label>
-                    <select id="hist-year" onchange="renderHistory()"></select>
-                </div>
-                <div class="form-group">
-                    <label>month</label>
-                    <select id="hist-month" onchange="renderHistory()"></select>
-                </div>
-            </div>
+    <div id="app-screen" class="screen">
+      <div class="user-info">
+        <span id="user-display">loading...</span>
+        <button id="btn-logout" style="padding: 4px 10px; font-size: 0.8rem;">logout</button>
+      </div>
 
-            <div class="table-wrapper" style="max-height: 200px; overflow-y: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="col-date">day</th>
-                            <th class="col-amt">bf</th>
-                            <th class="col-amt">lh</th>
-                            <th class="col-amt">dn</th>
-                            <th class="col-amt">ot</th>
-                            <th class="col-tot">tot</th>
-                        </tr>
-                    </thead>
-                    <tbody id="hist-table-body"></tbody>
-                </table>
+      <div class="nav-links">
+        <button id="btn-show-main" disabled>current month</button>
+        <button id="btn-show-history">archive lookup</button>
+      </div>
+
+      <div id="main-view">
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="row" style="align-items: flex-end;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label id="budget-label">set income/salary</label>
+              <input type="number" id="input-budget" placeholder="0">
             </div>
-            <div class="total-box">
-                <span>filter total:</span>
-                <span id="hist-total-amt" style="font-weight: bold; color: var(--color-lh);">0</span>
-            </div>
+            <button id="btn-save-budget">save</button>
+          </div>
         </div>
-    </div>
 
-    <!-- Core App Logic & Secure Cloud Handler -->
-    <script>
-        const CLIENT_ID = '987816810795-h2b2hgj09mvio7q0allbbbvbl3pr2eft.apps.googleusercontent.com'; 
-        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+        <div class="dashboard">
+          <div class="card">
+            <div class="card-title">total income</div>
+            <div class="card-value" id="dash-budget">0</div>
+          </div>
+          <div class="card">
+            <div class="card-title">total expense</div>
+            <div class="card-value" id="dash-expense" style="color: var(--error-color);">0</div>
+          </div>
+          <div class="card" style="grid-column: span 2;">
+            <div class="card-title">net balance</div>
+            <div class="card-value balance" id="dash-balance">0</div>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+        <h3>add transaction</h3>
+        <form id="expense-form" style="margin-top: 15px;">
+          <div class="row">
+            <div class="form-group">
+              <label>day</label>
+              <select id="select-day"></select>
+            </div>
+            <div class="form-group">
+              <label>amount</label>
+              <input type="number" id="input-amount" required placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>description</label>
+            <input type="text" id="input-desc" required placeholder="item note">
+          </div>
+          <button type="submit" style="width: 100%;">add item</button>
+        </form>
+
+        <div class="history-section">
+          <h3 id="current-month-title">records</h3>
+          <table id="table-current">
+            <thead>
+              <tr>
+                <th>date</th>
+                <th>note</th>
+                <th>amount</th>
+                <th>action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="history-view" class="screen">
+        <div class="section-header">
+          <h3>lookup archives</h3>
+          <button id="btn-back-main" style="padding: 4px 10px; font-size: 0.8rem;">&larr; back</button>
+        </div>
+
+        <div class="card">
+          <div class="row" style="align-items: flex-end;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>year</label>
+              <select id="history-year">
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>month</label>
+              <select id="history-month"></select>
+            </div>
+            <button id="btn-search-history">fetch</button>
+          </div>
+        </div>
+
+        <div class="dashboard" style="margin-top: 20px;">
+          <div class="card">
+            <div class="card-title">archive income</div>
+            <div class="card-value" id="hist-dash-budget">0</div>
+          </div>
+          <div class="card">
+            <div class="card-title">archive expense</div>
+            <div class="card-value" id="hist-dash-expense" style="color: var(--error-color);">0</div>
+          </div>
+          <div class="card" style="grid-column: span 2;">
+            <div class="card-title">archive balance</div>
+            <div class="card-value balance" id="hist-dash-balance">0</div>
+          </div>
+        </div>
+
+        <table id="table-history" style="margin-top: 20px;">
+          <thead>
+            <tr>
+              <th>date</th>
+              <th>note</th>
+              <th>amount</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------------------------------
+    // INJECTED FIREBASE CONFIGURATION (di-wallet-v1)
+    // ----------------------------------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyB7MTBBQLivq0vfixtXa8CLEIROUeebXGw",
+      authDomain: "di-wallet-v1.firebaseapp.com",
+      projectId: "di-wallet-v1",
+      storageBucket: "di-wallet-v1.firebasestorage.app",
+      messagingSenderId: "393481838636",
+      appId: "1:393481838636:web:60c0ec092c7fea0c823189",
+      measurementId: "G-EYGRQCDKQG"
+    };
+
+    // Initialize Firebase Engine
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    // App Global States
+    let currentUser = null;
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth() + 1; // 1-12
+    
+    const monthNames = [
+      "january", "february", "march", "april", "may", "june",
+      "july", "august", "september", "october", "november", "december"
+    ];
+
+    // DOM Elements Mapping
+    const authScreen = document.getElementById('auth-screen');
+    const appScreen = document.getElementById('app-screen');
+    const mainView = document.getElementById('main-view');
+    const historyView = document.getElementById('history-view');
+    
+    const btnLogin = document.getElementById('btn-login');
+    const btnLogout = document.getElementById('btn-logout');
+    const btnShowMain = document.getElementById('btn-show-main');
+    const btnShowHistory = document.getElementById('btn-show-history');
+    const btnBackMain = document.getElementById('btn-back-main');
+    const btnSaveBudget = document.getElementById('btn-save-budget');
+    const btnSearchHistory = document.getElementById('btn-search-history');
+    
+    const userDisplay = document.getElementById('user-display');
+    const currentMonthTitle = document.getElementById('current-month-title');
+    const budgetLabel = document.getElementById('budget-label');
+    
+    const inputBudget = document.getElementById('input-budget');
+    const selectDay = document.getElementById('select-day');
+    const inputAmount = document.getElementById('input-amount');
+    const inputDesc = document.getElementById('input-desc');
+    const expenseForm = document.getElementById('expense-form');
+    
+    const tableCurrentBody = document.getElementById('table-current').querySelector('tbody');
+    const tableHistoryBody = document.getElementById('table-history').querySelector('tbody');
+    
+    const historyMonthSelect = document.getElementById('history-month');
+    const historyYearSelect = document.getElementById('history-year');
+
+    // Dashboard values references
+    const dashBudget = document.getElementById('dash-budget');
+    const dashExpense = document.getElementById('dash-expense');
+    const dashBalance = document.getElementById('dash-balance');
+    
+    const histDashBudget = document.getElementById('hist-dash-budget');
+    const histDashExpense = document.getElementById('hist-dash-expense');
+    const histDashBalance = document.getElementById('hist-dash-balance');
+
+    // ----------------------------------------------------
+    // APP ENGINES & CORE RUNNERS
+    // ----------------------------------------------------
+    function init() {
+      setupMonthDropdowns();
+      populateDaysDropdown(currentYear, currentMonth, selectDay);
+      currentMonthTitle.textContent = `records overview: ${monthNames[currentMonth-1]} ${currentYear}`;
+      budgetLabel.textContent = `set status/income for ${monthNames[currentMonth-1]}`;
+      
+      // Track Authentication State Changes
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          currentUser = user;
+          userDisplay.textContent = user.displayName ? user.displayName.toLowerCase() : user.email;
+          authScreen.classList.remove('active');
+          appScreen.classList.add('active');
+          syncCurrentMonthData();
+        } else {
+          currentUser = null;
+          appScreen.classList.remove('active');
+          authScreen.classList.add('active');
+        }
+      });
+    }
+
+    function setupMonthDropdowns() {
+      monthNames.forEach((name, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx + 1;
+        opt.textContent = name;
+        if (idx + 1 === currentMonth) opt.selected = true;
+        historyMonthSelect.appendChild(opt);
+      });
+    }
+
+    function populateDaysDropdown(year, month, selectElement) {
+      selectElement.innerHTML = '';
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const currentDay = new Date().getDate();
+      
+      for (let i = 1; i <= daysInMonth; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = i;
+        if (i === currentDay && month === (new Date().getMonth() + 1)) opt.selected = true;
+        selectElement.appendChild(opt);
+      }
+    }
+
+    // ----------------------------------------------------
+    // TRIGGER EVENT LISTENERS
+    // ----------------------------------------------------
+    btnLogin.addEventListener('click', () => {
+      auth.signInWithPopup(provider).catch(err => alert(err.message));
+    });
+
+    btnLogout.addEventListener('click', () => {
+      auth.signOut();
+    });
+
+    // View Switching Mechanics (Navigation & Back Actions)
+    btnShowHistory.addEventListener('click', () => {
+      mainView.style.display = 'none';
+      historyView.classList.add('active');
+      btnShowHistory.disabled = true;
+      btnShowMain.disabled = false;
+    });
+
+    function returnToMainView() {
+      historyView.classList.remove('active');
+      mainView.style.display = 'block';
+      btnShowMain.disabled = true;
+      btnShowHistory.disabled = false;
+    }
+    btnShowMain.addEventListener('click', returnToMainView);
+    btnBackMain.addEventListener('click', returnToMainView);
+
+    // ----------------------------------------------------
+    // FIRESTORE CRUD INTERACTION
+    // ----------------------------------------------------
+    function getMonthDocRef(year, month) {
+      return db.collection('users').doc(currentUser.uid)
+               .collection('years').doc(String(year))
+               .collection('months').doc(String(month).padStart(2, '0'));
+    }
+
+    // Synchronize Realtime Data Feed
+    function syncCurrentMonthData() {
+      if (!currentUser) return;
+      const docRef = getMonthDocRef(currentYear, currentMonth);
+      
+      docRef.onSnapshot(doc => {
+        let budget = 0;
+        let expenses = [];
+
+        if (doc.exists) {
+          const data = doc.data();
+          budget = data.budget || 0;
+          expenses = data.expenses || [];
+        }
+
+        inputBudget.value = budget;
+        renderCurrentMonthTable(expenses, budget);
+      });
+    }
+
+    btnSaveBudget.addEventListener('click', () => {
+      if (!currentUser) return;
+      const budgetVal = parseFloat(inputBudget.value) || 0;
+      
+      getMonthDocRef(currentYear, currentMonth).set({
+        budget: budgetVal
+      }, { merge: true }).then(() => {
+        alert('monthly income targets configured.');
+      });
+    });
+
+    expenseForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const day = parseInt(selectDay.value);
+      const amount = parseFloat(inputAmount.value) || 0;
+      const desc = inputDesc.value.trim().toLowerCase();
+      
+      const transaction = {
+        id: Date.now().toString(),
+        day,
+        amount,
+        desc,
+        createdAt: new Date().toISOString()
+      };
+
+      getMonthDocRef(currentYear, currentMonth).update({
+        expenses: firebase.firestore.FieldValue.arrayUnion(transaction)
+      }).catch(err => {
+        // Document falls back initialization if not yet instantiated
+        return getMonthDocRef(currentYear, currentMonth).set({
+          expenses: [transaction]
+        }, { merge: true });
+      }).then(() => {
+        expenseForm.reset();
+        populateDaysDropdown(currentYear, currentMonth, selectDay);
+      });
+    });
+
+    function deleteTransaction(id, day, amount, desc, createdAt) {
+      if (!currentUser) return;
+      if (!confirm('confirm deletion of statement line item?')) return;
+
+      const targetObject = { id, day, amount, desc, createdAt };
+
+      getMonthDocRef(currentYear, currentMonth).update({
+        expenses: firebase.firestore.FieldValue.arrayRemove(targetObject)
+      });
+    }
+
+    // DOM Rendering Generators
+    function renderCurrentMonthTable(expenses, budget) {
+      tableCurrentBody.innerHTML = '';
+      expenses.sort((a, b) => a.day - b.day);
+      
+      let totalExpense = 0;
+      expenses.forEach(item => {
+        totalExpense += item.amount;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.day}</td>
+          <td>${item.desc}</td>
+          <td>${item.amount}</td>
+          <td><button class="btn-danger" data-id="${item.id}">delete</button></td>
+        `;
         
-        let expenseData = JSON.parse(localStorage.getItem('di_wallet_data')) || {};
-        let backupFileId = null;
-        let accessToken = localStorage.getItem('google_access_token') || null;
+        tr.querySelector('.btn-danger').addEventListener('click', () => {
+          deleteTransaction(item.id, item.day, item.amount, item.desc, item.createdAt);
+        });
+        tableCurrentBody.appendChild(tr);
+      });
 
-        window.onload = function() {
-            initSelectors();
-            setupDayDropdown();
-            renderCurrentMonthTable();
-            checkUrlForToken();
-            
-            if (accessToken) {
-                document.getElementById('auth-status').innerHTML = '<div class="user-info">connected</div>';
-                updateSyncStatus("streaming cloud index...");
-                syncWithCloud();
-            }
-        };
+      dashBudget.textContent = budget;
+      dashExpense.textContent = totalExpense;
+      dashBalance.textContent = budget - totalExpense;
+    }
 
-        function initiateGoogleLogin() {
-            const redirectUri = window.location.href.split('#')[0].split('?')[0];
-            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-                            `client_id=${encodeURIComponent(CLIENT_ID)}&` +
-                            `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-                            `response_type=token&` +
-                            `scope=${encodeURIComponent(SCOPES)}&` +
-                            `include_granted_scopes=true&` +
-                            `prompt=consent`;
-            window.location.href = authUrl;
-        }
+    // Historical Records Lookup Fetcher Engine
+    btnSearchHistory.addEventListener('click', () => {
+      if (!currentUser) return;
 
-        function checkUrlForToken() {
-            const hash = window.location.hash;
-            if (hash && hash.includes('access_token')) {
-                const params = new URLSearchParams(hash.substring(1));
-                accessToken = params.get('access_token');
-                localStorage.setItem('google_access_token', accessToken);
-                window.history.replaceState({}, document.title, window.location.pathname);
-                document.getElementById('auth-status').innerHTML = '<div class="user-info">connected</div>';
-                syncWithCloud();
-            }
-        }
+      const lookupYear = historyYearSelect.value;
+      const lookupMonth = String(historyMonthSelect.value).padStart(2, '0');
 
-        async function syncWithCloud() {
-            if (!accessToken) return;
-            updateSyncStatus("validating application folder pointer...");
-            try {
-                let listRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("name='di_wallet_backup.json' and spaces='appDataFolder'")}&spaces=appDataFolder`, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                let listData = await listRes.json();
-                
-                if (listData.files && listData.files.length > 0) {
-                    backupFileId = listData.files[0].id;
-                    updateSyncStatus("merging sync stream packet...");
-                    
-                    let fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${backupFileId}?alt=media`, {
-                        headers: { 'Authorization': `Bearer ${accessToken}` }
-                    });
-                    let cloudData = await fileRes.json();
-                    if (cloudData) {
-                        expenseData = Object.assign(cloudData, expenseData);
-                        localStorage.setItem('di_wallet_data', JSON.stringify(expenseData));
-                        renderCurrentMonthTable();
-                    }
-                }
-                await uploadToCloud();
-            } catch (err) {
-                console.error(err);
-                updateSyncStatus("handshake lost. re-auth required.");
-                localStorage.removeItem('google_access_token');
-            }
-        }
+      db.collection('users').doc(currentUser.uid)
+        .collection('years').doc(lookupYear)
+        .collection('months').doc(lookupMonth).get().then(doc => {
+          tableHistoryBody.innerHTML = '';
+          let budget = 0;
+          let expenses = [];
 
-        async function uploadToCloud() {
-            if (!accessToken) return;
-            updateSyncStatus("pushing layout array data...");
-            try {
-                if (backupFileId) {
-                    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${backupFileId}?uploadType=media`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(expenseData)
-                    });
-                } else {
-                    let metadata = { name: 'di_wallet_backup.json', parents: ['appDataFolder'] };
-                    let createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(metadata)
-                    });
-                    let createData = await createRes.json();
-                    backupFileId = createData.id;
-                    
-                    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${backupFileId}?uploadType=media`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(expenseData)
-                    });
-                }
-                updateSyncStatus("cloud state: optimal & secured");
-            } catch (e) {
-                console.error(e);
-                updateSyncStatus("cloud sync update failed.");
-            }
-        }
+          if (doc.exists) {
+            const data = doc.data();
+            budget = data.budget || 0;
+            expenses = data.expenses || [];
+          }
 
-        function initSelectors() {
-            const currentYear = new Date().getFullYear();
-            const ySelect = document.getElementById('hist-year');
-            const mSelect = document.getElementById('hist-month');
+          expenses.sort((a, b) => a.day - b.day);
+          let totalExpense = 0;
 
-            for (let y = currentYear - 3; y <= currentYear + 1; y++) {
-                ySelect.add(new Option(y, y));
-            }
-            ySelect.value = currentYear;
+          expenses.forEach(item => {
+            totalExpense += item.amount;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${item.day}</td>
+              <td>${item.desc}</td>
+              <td>${item.amount}</td>
+            `;
+            tableHistoryBody.appendChild(tr);
+          });
 
-            for (let m = 1; m <= 12; m++) {
-                mSelect.add(new Option(String(m).padStart(2, '0'), String(m).padStart(2, '0')));
-            }
-            mSelect.value = String(new Date().getMonth() + 1).padStart(2, '0');
-        }
+          histDashBudget.textContent = budget;
+          histDashExpense.textContent = totalExpense;
+          histDashBalance.textContent = budget - totalExpense;
 
-        function setupDayDropdown() {
-            const now = new Date();
-            const totalDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-            const daySelect = document.getElementById('inp-day');
-            daySelect.innerHTML = '';
-            for (let d = 1; d <= totalDays; d++) {
-                daySelect.add(new Option(`day ${String(d).padStart(2, '0')}`, d));
-            }
-            daySelect.value = now.getDate();
-        }
+          if(expenses.length === 0 && budget === 0) {
+            alert('no records detected inside this timestamp block.');
+          }
+        });
+    });
 
-        function switchTab(tab) {
-            document.getElementById('tab-input').classList.remove('active');
-            document.getElementById('tab-month').classList.remove('active');
-            document.getElementById('panel-input').classList.remove('active');
-            document.getElementById('panel-month').classList.remove('active');
-
-            if (tab === 'input') {
-                document.getElementById('tab-input').classList.add('active');
-                document.getElementById('panel-input').classList.add('active');
-            } else {
-                document.getElementById('tab-month').classList.add('active');
-                document.getElementById('panel-month').classList.add('active');
-                renderCurrentMonthTable();
-            }
-        }
-
-        function toggleModal(show) {
-            const modal = document.getElementById('settings-modal');
-            if (show) {
-                modal.classList.add('active');
-                renderHistory();
-            } else {
-                modal.classList.remove('active');
-            }
-        }
-
-        function saveTodayEntry() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(document.getElementById('inp-day').value).padStart(2, '0');
-            const key = `${year}-${month}-${day}`;
-            
-            const bf = parseFloat(document.getElementById('inp-bf').value) || 0;
-            const lh = parseFloat(document.getElementById('inp-lh').value) || 0;
-            const dn = parseFloat(document.getElementById('inp-dn').value) || 0;
-            const ot = parseFloat(document.getElementById('inp-ot').value) || 0;
-
-            expenseData[key] = { bf, lh, dn, ot, tot: bf + lh + dn + ot };
-            localStorage.setItem('di_wallet_data', JSON.stringify(expenseData));
-
-            document.getElementById('inp-bf').value = '';
-            document.getElementById('inp-lh').value = '';
-            document.getElementById('inp-dn').value = '';
-            document.getElementById('inp-ot').value = '';
-
-            updateSyncStatus("local packet mapped successfully.");
-            if (accessToken) {
-                uploadToCloud();
-            }
-        }
-
-        function renderCurrentMonthTable() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            document.getElementById('month-title').innerText = `active index: ${year}-${month}`;
-            buildTable(year, month, 'month-table-body', 'month-total-amt');
-        }
-
-        function renderHistory() {
-            const year = document.getElementById('hist-year').value;
-            const month = document.getElementById('hist-month').value;
-            buildTable(year, month, 'hist-table-body', 'hist-total-amt');
-        }
-
-        function buildTable(year, month, tbodyId, totalId) {
-            const tbody = document.getElementById(tbodyId);
-            tbody.innerHTML = '';
-            let grandTotal = 0;
-            const totalDays = new Date(year, parseInt(month), 0).getDate();
-
-            for (let d = 1; d <= totalDays; d++) {
-                const dayStr = String(d).padStart(2, '0');
-                const key = `${year}-${month}-${dayStr}`;
-                const r = expenseData[key];
-
-                if (r && r.tot > 0) {
-                    grandTotal += r.tot;
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="col-date">${dayStr}</td>
-                        <td class="col-amt">${r.bf || '-'}</td>
-                        <td class="col-amt">${r.lh || '-'}</td>
-                        <td class="col-amt">${r.dn || '-'}</td>
-                        <td class="col-amt">${r.ot || '-'}</td>
-                        <td class="col-tot">${r.tot}</td>
-                    `;
-                    tbody.appendChild(tr);
-                }
-            }
-            document.getElementById(totalId).innerText = grandTotal.toLocaleString();
-        }
-
-        function updateSyncStatus(msg) {
-            document.getElementById('sync-info').innerText = `>> system: ${msg}`;
-        }
-    </script>
+    window.onload = init;
+  </script>
 </body>
 </html>
