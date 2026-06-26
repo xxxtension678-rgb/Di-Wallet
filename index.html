@@ -445,28 +445,28 @@
   </div>
 
   <script>
-    // AUTOMATICALLY FIXED CONFIGURATION WITH YOUR CORRECT PROJECT CREDENTIALS
-      // အောက်က Config အမှန်တစ်ခုလုံးကို ကူးပြီး အစားထိုးလိုက်ပါဗျာ
+  // AUTOMATICALLY FIXED CONFIGURATION WITH YOUR NEW PROJECT CREDENTIALS
   const firebaseConfig = {
-    apiKey: "AIzaSyB7MTBQQlivq0vf_xtXa0lCL0X1Mfkz3A4",
-    authDomain: "di-wallet-v1.firebaseapp.com",
-    projectId: "di-wallet-v1",
-    storageBucket: "di-wallet-v1.firebaseapp.com",
-    messagingSenderId: "393481838636",
-    appId: "1:393481838636:web:60c0ec092c7fea0c823189",
-    measurementId: "G-EY0RQCDKQ3"
+    apiKey: "AIzaSyDOtA5YApGnhDCcOGXKrbfSQu1S9N-vTvU",
+    authDomain: "di-wallet-new-8e9c7.firebaseapp.com",
+    projectId: "di-wallet-new-8e9c7",
+    storageBucket: "di-wallet-new-8e9c7.firebasestorage.app",
+    messagingSenderId: "321111836951",
+    appId: "1:321111836951:web:b31cef995c76fef9058f52"
   };
 
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    // လိုင်းနံပါတ် ၄၆၁ နေရာမှာ ဒီကုဒ်ကို အစားထိုးထည့်ပေးလိုက်ပါဗျာ
-const provider = new firebase.auth.GoogleAuthProvider();
+  const provider = new firebase.auth.GoogleAuthProvider();
 
-provider.setCustomParameters({
-  client_id: "393481838636-47anq9kt393u1356j0ol9lfjk96jrkjq.apps.googleusercontent.com"
-});
+  provider.setCustomParameters({
+    client_id: "321111836951-sfjhq17g1hf2b13prd96g553vlt2f8ii.apps.googleusercontent.com"
+  });
+
+  let currentUser = null;
+
 
 let currentUser = null;
     let today = new Date();
