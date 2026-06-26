@@ -445,7 +445,7 @@
   </div>
 
   <script>
-  // YOUR ORIGINAL WORKING FIREBASE CONFIGURATION
+  // LINE 447 TO 469: REPLACED WITH ORIGINAL CREDENTIALS
   const firebaseConfig = {
     apiKey: "AIzaSyB7MTBQQlivq0vf_xtXa0lCL0X1Mfkz3A4",
     authDomain: "xxxtension678-rgb.firebaseapp.com",
@@ -461,12 +461,10 @@
 
   const provider = new firebase.auth.GoogleAuthProvider();
 
-  // ပုံ 458.jpg ရဲ့ အပေါ်ဆုံး URL ဘားမှာ ပြနေတဲ့ Client ID အမှန်ကြီး ဖြစ်ပါတယ်
   provider.setCustomParameters({
     client_id: "987816810795-h2b2dgj09mvio7q0allbbbvl3pr2eft.apps.googleusercontent.com"
   });
-
-  let currentUser = null;
+    
     
 let currentUser = null;
     let today = new Date();
