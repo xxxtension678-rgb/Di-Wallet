@@ -444,29 +444,7 @@
     </div>
   </div>
 
-<script>
-  // LINE 447 TO 469: THE MOST CLEAN & FINAL WORKING CONFIG
-  const firebaseConfig = {
-    apiKey: "AIzaSyB7MTBQQlivq0vf_xtXa0lCL0X1Mfkz3A4",
-    authDomain: "xxxtension678-rgb.firebaseapp.com",
-    projectId: "xxxtension678-rgb",
-    storageBucket: "xxxtension678-rgb.firebasestorage.app",
-    messagingSenderId: "393481838636",
-    appId: "1:393481838636:web:60c0ec092c7fea0c823189"
-  };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // client_id တွေ ထပ်ထည့်စရာမလိုဘဲ ရိုးရိုးရှင်းရှင်းပဲ ဒီအတိုင်း ထားလိုက်ပါဗျာ
-  const provider = new firebase.auth.GoogleAuthProvider();
-  
-    let today = new Date();
-    let currentYear = today.getFullYear();
-    let currentMonth = today.getMonth() + 1;
-    let globalActiveExpenses = [];
-    
     const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 
     const settingsOverlay = document.getElementById('settings-overlay');
@@ -497,6 +475,23 @@
       settingsOverlay.classList.remove('open');
       auth.signOut();
     });
+<script>
+  // LINE 447 TO 469: REPLACED WITH CLEAN ORIGINAL CONFIG
+  const firebaseConfig = {
+    apiKey: "AIzaSyB7MTBQQlivq0vf_xtXa0lCL0X1Mfkz3A4",
+    authDomain: "xxxtension678-rgb.firebaseapp.com",
+    projectId: "xxxtension678-rgb",
+    storageBucket: "xxxtension678-rgb.firebasestorage.app",
+    messagingSenderId: "393481838636",
+    appId: "1:393481838636:web:60c0ec092c7fea0c823189"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // client_id သီးသန့် ထည့်စရာမလိုတော့ဘဲ ရိုးရိုးရှင်းရှင်းပဲ ထားလိုက်ပါဗျာ
+  const provider = new firebase.auth.GoogleAuthProvider();
 
     function init() {
       document.getElementById('dash-date').textContent = `${today.getDate()}/${currentMonth}/${currentYear}`;
