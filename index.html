@@ -444,8 +444,8 @@
     </div>
   </div>
 
-  <script>
-  // LINE 447 TO 469: REPLACED WITH ORIGINAL CREDENTIALS
+<script>
+  // LINE 447 TO 469: THE MOST CLEAN & FINAL WORKING CONFIG
   const firebaseConfig = {
     apiKey: "AIzaSyB7MTBQQlivq0vf_xtXa0lCL0X1Mfkz3A4",
     authDomain: "xxxtension678-rgb.firebaseapp.com",
@@ -459,14 +459,9 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  // client_id တွေ ထပ်ထည့်စရာမလိုဘဲ ရိုးရိုးရှင်းရှင်းပဲ ဒီအတိုင်း ထားလိုက်ပါဗျာ
   const provider = new firebase.auth.GoogleAuthProvider();
-
-  provider.setCustomParameters({
-    client_id: "987816810795-h2b2dgj09mvio7q0allbbbvl3pr2eft.apps.googleusercontent.com"
-  });
-    
-    
-let currentUser = null;
+  
     let today = new Date();
     let currentYear = today.getFullYear();
     let currentMonth = today.getMonth() + 1;
